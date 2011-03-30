@@ -4,9 +4,12 @@ first: one
 MAKEFLAGS+= --no-print-directory
 
 # Fortran compiler and flags
-FC=nagfor_beta
-FPP=nagfor
-FFLAGS=-f2003 -colour -O0 -C=all -fpp -v
+FC=gfortran
+FPP=gfortran
+FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v
+FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
+FFLAGS=$(FFLAGS_$(FC))
+
 LDFLAGS=
 %.o: %.f03
 	$(FC) -c $(FFLAGS) $^
