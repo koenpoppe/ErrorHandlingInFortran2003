@@ -1,0 +1,21 @@
+=> register_username( '' )
+ Precondition violated: username must not be empty
+
+=> register_username( 'Koen' )
+ Username must contain one or more digits
+
+=> register_username( 'Koen 123' )
+ Username must not contain spaces
+
+=> register_username( 'Koen.123' )
+OK.
+
+-- Altering the future: the username will be existing --
+=> register_username( 'Koen.123' )
+ Username is already used
+
+-- Altering the future: the connection to the server will fail --
+=> register_username( 'Koen.123' )
+ Could not verify the username
+
+

@@ -1,0 +1,16 @@
+1st call to solve
+Solution returned in x:
+   0.100E+01  0.500E+00  0.333E+00
+
+2nd call to solve
+No solution returned in x because
+ The matrix is ill conditioned
+
+3th call to solve
+No solution returned in x because
+ The matrix is ill conditioned
+
+4th call to solve
+No solution returned in x because
+ The trans argument must be one of the following characters: 'NnTtCc'
+

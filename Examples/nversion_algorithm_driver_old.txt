@@ -1,0 +1,24 @@
+
+=> my_nversion_algorithm(       100 )
+Performing my_nversion_algorithm version 1.
+
+=> my_nversion_algorithm(      1000 )
+ Allocation over 1000000 not allowed due to fixed memory bound
+Performing my_nversion_algorithm version 2.
+
+=> my_nversion_algorithm(   1000000 )
+ Allocation of negative number of elements is not valid
+ Allocation of negative number of elements is not valid
+Performing my_nversion_algorithm version 3.
+
+=> my_nversion_algorithm(   1000001 )
+ Allocation over 1000000 not allowed due to fixed memory bound
+ Allocation of negative number of elements is not valid
+ Version 3 is only valid for even values of N
+ Failed to perform any of the versions of the algorithm
+
+=> my_nversion_algorithm(   1000002 )
+ Allocation of negative number of elements is not valid
+ Allocation of negative number of elements is not valid
+ Allocation over 1000000 not allowed due to fixed memory bound
+ Failed to perform any of the versions of the algorithm

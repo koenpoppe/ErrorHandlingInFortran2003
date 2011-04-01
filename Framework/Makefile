@@ -2,7 +2,7 @@ FC=ifort
 
 # nagfor      = NAG Fortran Compiler Release 5.2(752)
 # nagfor_beta = NAG Fortran Compiler Release 5.3(820),5.2(762)
-FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v -mdir $(LIBDIR)
+FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v -mdir $(LIBDIR) -I $(LIBDIR)
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor) -DFC_SUPP_FINAL -DFC_SUPP_SAME_TYPE_AS
 
 # gfortran_beta = GNU Fortran (GCC) 4.7.0 20110326 (experimental)

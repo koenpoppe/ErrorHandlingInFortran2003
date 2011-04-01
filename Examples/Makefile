@@ -3,14 +3,18 @@ first: one
 .PHONY: clean cleanpreprocs cleandrivers cleanlogs all
 MAKEFLAGS+= --no-print-directory
 
+# Library
+LIBRARY_DIR=../Framework/Build_$(FC)/
+LIBRARY=-lexception_handling
+
 # Fortran compiler and flags
-FC=gfortran
-FPP=gfortran
-FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v
+FC=nagfor
+FPP=$(FC)
+FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v -I $(LIBRARY_DIR)
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 FFLAGS=$(FFLAGS_$(FC))
 
-LDFLAGS=
+LDFLAGS= -L$(LIBRARY_DIR) $(LIBRARY)
 %.o: %.f03
 	$(FC) -c $(FFLAGS) $^
 
@@ -59,8 +63,8 @@ DRIVER_PROG=$(DRIVER)_$(VERSION)
 DRIVERS_PROG=$(addsuffix _$(VERSION),$(DRIVERS))
 
 one: $(DRIVER_PROG)
-$(DRIVER_PROG): exception_handling.o $(EXAMPLE).o $(DRIVER).o
-	$(FC) -o $@ $(LDFLAGS) $^
+$(DRIVER_PROG): $(EXAMPLE).o $(DRIVER).o
+	$(FC) -o $@ $^ $(LDFLAGS)
 cleandrivers:
 	$(RM) $(DRIVERS_PROG)
 

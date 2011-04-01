@@ -316,13 +316,14 @@ contains
         write(unit=REPORT_UNIT,fmt="(A)") ":"
         
         if( associated(exc%info) ) then
-            message = "exc%info%info_message(message)"
-!             call exc%info%info_message(message)
+            call exc%info%info_message(message)
             write(unit=REPORT_UNIT,fmt="(2A)") "       ", trim(adjustl(message))
         end if
         
-        if( is_exception( exc ) ) then
-            call write_exception_trace( exc%reason, level+1 )
+        if( associated( exc%reason ) ) then ! TODO: necessary?
+            if( is_exception( exc ) ) then
+                call write_exception_trace( exc%reason, level+1 )
+            end if
         end if
         
     end subroutine write_exception_trace

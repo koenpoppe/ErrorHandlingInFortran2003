@@ -1,0 +1,23 @@
+Invalid integer try again... (4 attempts left)
+ => Number =  111
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Exception from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 106.
+ ** cascading:
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Exception from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 210.
+ ** cascading:
+
