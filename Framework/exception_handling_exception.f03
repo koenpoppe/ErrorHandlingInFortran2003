@@ -26,7 +26,13 @@ module exception_handling_exception
     ! Derived types
     !--------------------------------------------------------------------------
     
-    ! 1. Exceptions itself
+    ! 1. Abstract information type
+      type, public :: exception_info ! TODO: abstract
+      contains
+          procedure, pass, public :: info_message => exception_info_info_message
+      end type exception_info
+
+    ! 2. Exceptions itself
     type, public :: exception
         class(exception_info), pointer :: info => NULL()
         character(:), allocatable :: method
@@ -37,12 +43,6 @@ module exception_handling_exception
         final :: exception_final
 #endif
     end type exception
-    
-    ! 2. Abstract information type
-    type, public :: exception_info ! TODO: abstract
-    contains
-        procedure, pass, public :: info_message => exception_info_info_message
-    end type exception_info
 
     ! 3. Sentinel no-exception information type
     type, extends(exception_info), public :: no_exception
@@ -89,7 +89,8 @@ contains
     !--------------------------------------------------------------------------
     ! Derived types
     !--------------------------------------------------------------------------
-    
+
+#ifdef FC_SUPP_FINAL
     ! 1. Exceptions itself
 #ifdef FC_SUPP_FINAL
     recursive subroutine exception_final( exc )

@@ -13,7 +13,7 @@ FFLAGS_gfortran_beta=$(FFLAGS_gfortran)
 FFLAGS_g95=-std=f2003 -fmod=$(LIBDIR)
 
 # ifort = ifort (IFORT) 11.0 20080930
-FFLAGS_ifort= -module $(LIBDIR) -free -Tf
+FFLAGS_ifort= -module $(LIBDIR) -fpp -free -Tf
 
 
 

@@ -8,15 +8,17 @@ LIBRARY_DIR=../Framework/Build_$(FC)/
 LIBRARY=-lexception_handling
 
 # Fortran compiler and flags
-FC=nagfor
+FC=ifort
 FPP=$(FC)
-FFLAGS_nagfor=-f2003 -colour -O0 -C=all -fpp -v -I $(LIBRARY_DIR)
+FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v 
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
+FFLAGS_ifort=-f2003 -I $(LIBRARY_DIR) -fpp -free -Tf
+
 FFLAGS=$(FFLAGS_$(FC))
 
 LDFLAGS= -L$(LIBRARY_DIR) $(LIBRARY)
 %.o: %.f03
-	$(FC) -c $(FFLAGS) $^
+	$(FC) -c $(DEFINES) $(FFLAGS) $^
 
 clean:
 	$(RM) *.o *.mod
@@ -36,7 +38,6 @@ ifeq ($(VERSION),new)
 else
 	DEFINES=
 endif
-FFLAGS+=$(DEFINES)
 
 # How to preprocess the files
 EXAMPLE_PREPROC=$(EXAMPLE)_$(VERSION).f03
@@ -46,11 +47,11 @@ DRIVERS_PREPROC=$(addsuffix _$(VERSION).f03,$(DRIVERS))
 
 preprocs: $(EXAMPLE_PREPROC) $(DRIVER_PREPROC)
 $(EXAMPLE_PREPROC): $(EXAMPLE).f03
-	$(FPP) -o tmp_$@ $(FFLAGS) -F $^
+	$(FPP) -o tmp_$@ $(DEFINES) $(FFLAGS) -F $^
 	cat tmp_$@ | grep -v "^# " > $@
 	$(RM) tmp_$@
 $(DRIVER_PREPROC): $(DRIVER).f03
-	$(FPP) -o tmp_$@ $(FFLAGS) -F $^
+	$(FPP) -o tmp_$@ $(DEFINES) $(FFLAGS) -F $^
 	cat tmp_$@ | grep -v "^# " > $@
 	$(RM) tmp_$@
 
