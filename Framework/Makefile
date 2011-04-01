@@ -41,5 +41,7 @@ $(LIBRARY): $(LIBDIR) $(OBJECTS)
 
 clean:
 	$(RM) *.o *.mod
+
 veryclean: clean
 	$(RM) $(LIBRARY)
+	$(RM) -r $(LIBDIR)
