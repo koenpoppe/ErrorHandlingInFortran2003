@@ -43,7 +43,7 @@ contains
     ! TODO: allocate wrapper for all types ...
     
     subroutine error_code_exception_info_message( info, message )
-        class(error_code_exception), intent(inout) ::  info
+        class(error_code_exception), intent(in) :: info
         character(len=*), intent(out) :: message
         
         write(unit=message,fmt="(A,I0,A)") & 
