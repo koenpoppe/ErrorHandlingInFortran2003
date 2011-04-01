@@ -127,7 +127,7 @@ contains
     end subroutine exception_info_info_message
     
     subroutine message_exception_info_message( info, message )
-        class(message_exception), intent(inout) ::  info
+        class(message_exception), intent(in) ::  info
         character(len=*), intent(out) :: message
 
         if( allocated(info%message) ) then
