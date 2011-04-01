@@ -10,9 +10,11 @@ LIBRARY=-lexception_handling
 # Fortran compiler and flags
 FC=ifort
 FPP=$(FC)
+
 FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v 
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
-FFLAGS_ifort=-f2003 -I $(LIBRARY_DIR) -fpp -free -Tf
+
+FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -free -Tf
 
 FFLAGS=$(FFLAGS_$(FC))
 
