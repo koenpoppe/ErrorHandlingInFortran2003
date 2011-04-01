@@ -185,7 +185,9 @@ contains
         character(len=*), intent(in), optional :: method
         
         ! Prepare the exception
-        allocate( ifail%info, source=info )
+        !allocate( ifail%info, source=info ) ! Shorter form, but ifort does not support this.
+        allocate(ifail%info)
+        ifail%info=>info
         
         if( present(method) ) then
             if( len_trim(method) > 0 ) then
@@ -345,7 +347,9 @@ contains
         class(exception), intent(in out) :: inform
         
         if( associated(inform%info) ) then
-            allocate( ifail%info, source=inform%info )
+            !allocate( ifail%info, source=inform%info ) ! Shorter form, but unsupported by ifort
+            allocate(ifail%info)
+            ifail%info=>inform%info
         end if
         
         if( allocated(inform%method) ) then
