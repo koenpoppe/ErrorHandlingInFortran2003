@@ -141,7 +141,7 @@ contains
         ! Enforce a fixed memory bound
         if( workspace_size > workspace_bound ) then
 #ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, memory_exception( workspace_bound, (/ workspace_size /) ), &
+            call create_exception(ifail, allocation_exception( workspace_bound, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace:enforced" )
 #else
             call handle_error( 81001, ifail )
@@ -152,7 +152,7 @@ contains
         ! Verify unreasonable sizes
         if( workspace_size < 0) then
 #ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, memory_exception( -1, (/ workspace_size /) ), &
+            call create_exception(ifail, allocation_exception( -1, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace:negative" )
 #else
             call handle_error( 81002, ifail )
@@ -164,7 +164,7 @@ contains
         allocate( workspace(workspace_size), stat=stat )
         if( stat /= 0 ) then
 #ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, memory_exception( stat, (/ workspace_size /) ), &
+            call create_exception(ifail, allocation_exception( stat, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace" )
 #else
             call handle_error( 81000 + stat, ifail )

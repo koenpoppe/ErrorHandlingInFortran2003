@@ -18,18 +18,18 @@ module exception_handling_common_exceptions
         procedure :: info_message => iostat_exception_info_message
     end type iostat_exception
     
-    ! - memory exception (includes shape of requested allocation)
-    type, extends(exception_info), public :: memory_exception
+    ! - allocation exception (includes shape of requested allocation)
+    type, extends(exception_info), public :: allocation_exception
         integer :: error_code
         integer, dimension(:), allocatable :: requested_shape
     contains
-        procedure :: info_message => memory_exception_info_message
-    end type memory_exception
+        procedure :: info_message => allocation_exception_info_message
+    end type allocation_exception
     
 contains
     
-    subroutine memory_exception_info_message( info, message )
-        class(memory_exception), intent(in) :: info
+    subroutine allocation_exception_info_message( info, message )
+        class(allocation_exception), intent(in) :: info
         character(len=*), intent(out) :: message
         if( size(info%requested_shape) == 1 ) then
             write(unit=message,fmt="(A,I0,A,I0,A)") "Allocating array with ", info%requested_shape, & 
@@ -39,7 +39,7 @@ contains
                 " (=", product(info%requested_shape), & 
                 " elements) did not work (error code ", info%error_code, ")."
         end if
-    end subroutine memory_exception_info_message
+    end subroutine allocation_exception_info_message
     ! TODO: allocate wrapper for all types ...
     
     subroutine error_code_exception_info_message( info, message )

@@ -24,6 +24,7 @@ LIBRARY=$(LIBDIR)libexception_handling.a
 OBJECTS= \
 	exception_handling_exception.o \
 	exception_handling_common_exceptions.o \
+	exception_handling_common_wrappers.o \
 	exception_handling_legacy.o \
 	design_by_contract.o \
 	exception_handling.o
