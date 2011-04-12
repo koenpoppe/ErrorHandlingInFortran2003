@@ -26,6 +26,8 @@ module exception_handling
     use exception_handling_exception
     use exception_handling_legacy
     use exception_handling_common_exceptions
+    use exception_handling_common_wrappers
+    use exception_handling_unit_test
     implicit none
     public
     save

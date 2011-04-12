@@ -27,6 +27,7 @@ OBJECTS= \
 	exception_handling_common_wrappers.o \
 	exception_handling_legacy.o \
 	design_by_contract.o \
+	exception_handling_unit_test.o \
 	exception_handling.o
 
 first: $(LIBRARY)

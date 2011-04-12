@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wrappers>
+	<allocate>
+		<alltypes_allranks minrank="1"/>
+	</allocate>
+</wrappers>
