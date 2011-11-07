@@ -1,4 +1,4 @@
-! EXCEPTION_HANDLING_LEGACY
+! ERROR_HANDLING_LEGACY
 ! 
 !   Utilities to simplify the migration of older codes.
 ! 
@@ -14,9 +14,9 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-module exception_handling_legacy
+module error_handling_legacy
 
-    use exception_handling_exception
+    use error_handling_error
     implicit none
     private
     save
@@ -35,14 +35,14 @@ module exception_handling_legacy
     
     public :: operator(.EQ.)
     interface operator(.EQ.)
-        module procedure exception_eq_int
-        module procedure exception_eq_int_rev
+        module procedure error_eq_int
+        module procedure error_eq_int_rev
     end interface
     
     public :: operator(.NE.)
     interface operator(.NE.)
-        module procedure exception_neq_int
-        module procedure exception_neq_int_rev
+        module procedure error_neq_int
+        module procedure error_neq_int_rev
     end interface
     
 contains
@@ -52,58 +52,58 @@ contains
     !--------------------------------------------------------------------------
     ! TODO: unit?
     
-    ! Do not report the exception
+    ! Do not report the error
     subroutine soft_silent_error( ifail )
-        type(exception), intent(in out) :: ifail
-        call discard_exception( ifail )
+        type(error), intent(in out) :: ifail
+        call discard_error( ifail )
     end subroutine soft_silent_error
 
-    ! Report the exception, discard the error and continue execution
+    ! Report the error, discard the error and continue execution
     subroutine soft_noisy_error( ifail )
-        type(exception), intent(in out) :: ifail
-        call report_exception( ifail, fatal = .false. )
+        type(error), intent(in out) :: ifail
+        call report_error( ifail, fatal = .false. )
     end subroutine soft_noisy_error
 
-    ! Report the exception and abort the execution
+    ! Report the error and abort the execution
     subroutine hard_noisy_error( ifail )
-        type(exception), intent(in out) :: ifail
-        call report_exception( ifail, fatal = .true. )
+        type(error), intent(in out) :: ifail
+        call report_error( ifail, fatal = .true. )
     end subroutine hard_noisy_error
     
     !--------------------------------------------------------------------------
     ! Convienience operator overloading
     !--------------------------------------------------------------------------
     
-    function exception_eq_int( exc, code ) result( equal )
-        class(exception), intent(in) :: exc
+    function error_eq_int( exc, code ) result( equal )
+        class(error), intent(in) :: exc
         integer, intent(in) :: code
         logical :: equal
         
         if( code == 0 ) then
             equal = .not. associated( exc%info ) ! TODO?
         else
-            print *, "TODO: comparison exception with non-zero code?"
+            print *, "TODO: comparison error with non-zero code?"
             equal = (code==0)
         end if
         
-    end function exception_eq_int
-    function exception_neq_int( exc, code ) result( not_equal )
-        class(exception), intent(in) :: exc
+    end function error_eq_int
+    function error_neq_int( exc, code ) result( not_equal )
+        class(error), intent(in) :: exc
         integer, intent(in) :: code
         logical :: not_equal
         not_equal = .not. ( exc == code )
-    end function exception_neq_int
-    function exception_eq_int_rev( code, exc ) result( equal )
+    end function error_neq_int
+    function error_eq_int_rev( code, exc ) result( equal )
         integer, intent(in) :: code
-        class(exception), intent(in) :: exc
+        class(error), intent(in) :: exc
         logical :: equal
-        equal = exception_eq_int( exc, code )
-    end function exception_eq_int_rev
-    function exception_neq_int_rev( code, exc ) result( not_equal )
-        class(exception), intent(in) :: exc
+        equal = error_eq_int( exc, code )
+    end function error_eq_int_rev
+    function error_neq_int_rev( code, exc ) result( not_equal )
+        class(error), intent(in) :: exc
         integer, intent(in) :: code
         logical :: not_equal
         not_equal = .not. ( exc == code )
-    end function exception_neq_int_rev
+    end function error_neq_int_rev
 
-end module exception_handling_legacy
+end module error_handling_legacy

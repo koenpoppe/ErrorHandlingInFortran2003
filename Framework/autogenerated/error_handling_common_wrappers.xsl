@@ -5,7 +5,7 @@
 	<!-- MAIN -->
 	
 	<xsl:template match="wrappers">
-<xsl:text/>! EXCEPTION_HANDLING_COMMON_WRAPPERS
+<xsl:text/>! ERROR_HANDLING_COMMON_WRAPPERS
 ! 
 !   Collection of wrapper arround commonly used intrinsic routines that need
 !   to check some condition.
@@ -22,9 +22,9 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-module exception_handling_common_wrappers
-    use exception_handling_exception
-    use exception_handling_common_exceptions
+module error_handling_common_wrappers
+    use error_handling_error
+    use error_handling_common_errors
     implicit none
     private
     save
@@ -35,7 +35,7 @@ module exception_handling_common_wrappers
 contains
 <xsl:call-template name="procedures"/>
 
-end module exception_handling_common_wrappers
+end module error_handling_common_wrappers
 	</xsl:template>
 	
 	<!-- TEMPLATES -->
@@ -47,7 +47,7 @@ end module exception_handling_common_wrappers
     subroutine <xsl:call-template name="name-mangler"/>( array, sizes, ifail )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, allocatable, intent(out) :: array
         integer<xsl:call-template name="rank-dimension"/>, intent(in) :: sizes
-        type(exception), intent(out) :: ifail
+        type(error), intent(out) :: ifail
         integer :: stat
         allocate( array( <xsl:text/>
 <xsl:choose>
@@ -59,8 +59,8 @@ end module exception_handling_common_wrappers
 		</xsl:choose>
 		<xsl:text/> ), stat=stat )
         if( stat /= 0 ) then
-            call create_exception( ifail, &amp;
-                allocation_exception( stat, <xsl:if test="@rank = 1">(/ </xsl:if>sizes<xsl:if test="@rank = 1"> /)</xsl:if> ) )
+            call create_error( ifail, &amp;
+                allocation_error( stat, <xsl:if test="@rank = 1">(/ </xsl:if>sizes<xsl:if test="@rank = 1"> /)</xsl:if> ) )
         end if
     end subroutine <xsl:call-template name="name-mangler"/>
 		</xsl:for-each>

@@ -19,16 +19,16 @@ FFLAGS_ifort= -module $(LIBDIR) -fpp -g -check -warn -free -Tf
 
 FFLAGS=$(FFLAGS_$(FC))
 LIBDIR=Build_$(FC)/
-LIBRARY=$(LIBDIR)libexception_handling.a
+LIBRARY=$(LIBDIR)liberror_handling.a
 
 OBJECTS= \
-	exception_handling_exception.o \
-	exception_handling_common_exceptions.o \
-	exception_handling_common_wrappers.o \
-	exception_handling_legacy.o \
+	error_handling_error.o \
+	error_handling_common_errors.o \
+	error_handling_common_wrappers.o \
+	error_handling_legacy.o \
 	design_by_contract.o \
-	exception_handling_unit_test.o \
-	exception_handling.o
+	error_handling_unit_test.o \
+	error_handling.o
 
 first: $(LIBRARY)
 

@@ -1,13 +1,13 @@
-!(doc)TITLE{Exception handling}
-!(doc)SUBTITLE{Advanced exception handling in Fortran}
+!(doc)TITLE{Error handling}
+!(doc)SUBTITLE{Advanced error handling in Fortran}
 !(doc)VERSION{0.1}
 !(doc)AUTHOR{Koen Poppe}
 !(doc)DATE{2011-01-27}
 !(doc)header
 
-! EXCEPTION_HANDLING
+! ERROR_HANDLING
 ! 
-!   Module for advanced exception handling.
+!   Module for advanced error handling.
 ! 
 ! HISTORY
 ! 
@@ -21,17 +21,17 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-module exception_handling
+module error_handling
     
-    use exception_handling_exception
-    use exception_handling_legacy
-    use exception_handling_common_exceptions
-    use exception_handling_common_wrappers
-    use exception_handling_unit_test
+    use error_handling_error
+    use error_handling_legacy
+    use error_handling_common_errors
+    use error_handling_common_wrappers
+    use error_handling_unit_test
     implicit none
     public
     save
     
-end module exception_handling
+end module error_handling
 
 !(doc)footer

@@ -1,24 +1,24 @@
-!!! 20110330 KP - From exception_handling_exception
+!!! 20110330 KP - From error_handling_error
 ! Reason: not really useful
 
     ! 6. Comparing
     public :: operator(.EQ.)
     interface operator(.EQ.)
-        module procedure exception_eq_exception
-        module procedure exception_info_eq_exception_info
+        module procedure error_eq_error
+        module procedure error_info_eq_error_info
     end interface
     
     public :: operator(.NE.)
     interface operator(.NE.)
-        module procedure exception_neq_exception
-        module procedure exception_info_neq_exception_info
+        module procedure error_neq_error
+        module procedure error_info_neq_error_info
     end interface
 
 contains
 
     ! 6. Comparing
-    function exception_eq_exception( exc, cxe ) result( equal )
-        class(exception), intent(in) :: exc, cxe
+    function error_eq_error( exc, cxe ) result( equal )
+        class(error), intent(in) :: exc, cxe
         logical :: equal
         
         equal = .false.
@@ -54,32 +54,32 @@ contains
         
         equal = .true.
         
-    end function exception_eq_exception
-    function exception_neq_exception( exc, cxe ) result( not_equal )
-        class(exception), intent(in) :: exc, cxe
+    end function error_eq_error
+    function error_neq_error( exc, cxe ) result( not_equal )
+        class(error), intent(in) :: exc, cxe
         logical :: not_equal
         not_equal = .not. ( exc == cxe )
-    end function exception_neq_exception
+    end function error_neq_error
     
-    function exception_info_eq_exception_info( exc, cxe ) result( equal )
-        class(exception_info), intent(in) :: exc, cxe
+    function error_info_eq_error_info( exc, cxe ) result( equal )
+        class(error_info), intent(in) :: exc, cxe
         logical :: equal
 
 #ifdef FC_SUPP_SAME_TYPE_AS
         if( .not. SAME_TYPE_AS( exc, cxe ) ) then
             equal = .false.
         else
-            print *, "exception_info_eq_exception_info: different types"
+            print *, "error_info_eq_error_info: different types"
             equal = .true. ! TODO
         end if
 #else
-        print *, "exception_info_eq_exception_info: no FC_SUPP_SAME_TYPE_AS"
+        print *, "error_info_eq_error_info: no FC_SUPP_SAME_TYPE_AS"
         equal = .true.
 #endif
         
-    end function exception_info_eq_exception_info
-    function exception_info_neq_exception_info( exc, cxe ) result( not_equal )
-        class(exception_info), intent(in) :: exc, cxe
+    end function error_info_eq_error_info
+    function error_info_neq_error_info( exc, cxe ) result( not_equal )
+        class(error_info), intent(in) :: exc, cxe
         logical :: not_equal
         not_equal = .not. ( exc == cxe )
-    end function exception_info_neq_exception_info
+    end function error_info_neq_error_info
