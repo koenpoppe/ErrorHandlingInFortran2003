@@ -26,7 +26,7 @@ module design_by_contract
     !--------------------------------------------------------------------------
 
     ! 1. General Design by Contract exception
-    type, extends(message_exception) :: dbc_exception
+    type, extends(message_exception), public :: dbc_exception
     contains
         procedure :: info_message => exception_info_message_dbc_exception
     end type dbc_exception

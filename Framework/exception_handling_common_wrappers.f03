@@ -6,7 +6,7 @@
 ! HISTORY
 ! 
 !   20110411 KP - Initial version
-!   20110412 (KP) - Re-generated
+!   20110413 (KP) - Re-generated
 ! 
 ! AUTHOR
 ! 
@@ -22,6 +22,7 @@ module exception_handling_common_wrappers
     private
     save
 
+    public :: allocate
     interface allocate
         module procedure allocate_logical_rank1
         module procedure allocate_logical_rank2

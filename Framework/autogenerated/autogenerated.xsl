@@ -93,6 +93,7 @@
 	
 	<xsl:template name="interfaces">
 		<xsl:for-each select="*"><xsl:text/>
+    public :: <xsl:value-of select="name(.)"/>
     interface <xsl:value-of select="name(.)"/>
 			<xsl:apply-templates select="*">
 				<xsl:with-param name="callback">module-procedure</xsl:with-param>
@@ -116,12 +117,12 @@
 	</xsl:template>
 	
 	<xsl:template name="rank-specification">
+		<xsl:param name="rank" select="@rank"/>
 		<xsl:choose>
-			<xsl:when test="@rank = 0">
+			<xsl:when test="$rank = 0">
 				<!-- NOP -->
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:variable name="rank" select="@rank"/>
 				<xsl:text>, dimension(</xsl:text><xsl:for-each select="exsl:node-set($ranks)/rank[ 0 &lt; . and . &lt;= $rank]"><xsl:if test=". &gt; 1 ">,</xsl:if>:</xsl:for-each><xsl:text>)</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>

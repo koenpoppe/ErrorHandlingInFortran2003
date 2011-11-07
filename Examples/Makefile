@@ -8,13 +8,13 @@ LIBRARY_DIR=../Framework/Build_$(FC)/
 LIBRARY=-lexception_handling
 
 # Fortran compiler and flags
-FC=ifort
+FC=nagfor_beta
 FPP=$(FC)
 
 FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v 
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 
-FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -free -Tf
+FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
 
 FFLAGS=$(FFLAGS_$(FC))
 
@@ -27,7 +27,7 @@ clean:
 
 # The available examples and the selected one
 EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve
-EXAMPLE=fragile_input
+EXAMPLE=unittest_test
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))
@@ -135,3 +135,9 @@ flags:
 	@echo "$(VERSION): $(FFLAGS)"
 allflags:
 	$(MAKE) allversions_unsafe ALLTARGET=flags
+
+# TEMP
+unittest_test: unittest_test.o
+	$(FC) -o $@ $^ $(LDFLAGS)
+test: unittest_test
+	./unittest_test

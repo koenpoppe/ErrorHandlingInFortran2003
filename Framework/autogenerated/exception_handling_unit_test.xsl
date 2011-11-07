@@ -5,11 +5,31 @@
 	<xsl:variable name="ASSERT_OPTIONS">
 		<xsl:text>a_name,b_name,filename,line,comment, ifail</xsl:text>
 	</xsl:variable>
-	<xsl:variable name="ASSERT_OPTIONS_DECLARATION"><xsl:text>
-		character(len=*), intent(in), optional :: a_name,b_name,filename,comment
-		integer, intent(in), optional :: line
-		type(exception), intent(out), optional :: ifail</xsl:text>
+	<xsl:variable name="ASSERT_OPTIONS_DECLARATION"><xsl:text/>
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(exception), intent(out), optional :: ifail<xsl:text/>
 	</xsl:variable>
+	<xsl:variable name="ASSERT_OPTIONS_TYPEDECLARATION">
+        <xsl:text/>character(:), allocatable :: a_name,b_name,filename
+        integer :: line = -1<xsl:text/>
+	</xsl:variable>
+	<xsl:template name="assert-options-typeassignment">
+		<xsl:param name="condition"/>
+			! Populate exception_info type
+			info%a_name = optional_name( a_name, "" )
+			info%b_name = optional_name( b_name, "" )
+			info%filename = optional_name( filename, "" )
+			if( present(line) ) then
+			    info%line = line
+			else
+			    info%line = -1
+			end if
+
+			info%diff = .not. ( <xsl:value-of select="$condition"/> )
+			info%a = a_str
+			info%b = b_str
+	</xsl:template>
 	
 	<!-- MAIN -->
 	
@@ -34,6 +54,7 @@
 !
 module exception_handling_unit_test
     use exception_handling_exception
+    use design_by_contract
     implicit none
     private
     save
@@ -48,7 +69,7 @@ module exception_handling_unit_test
     public :: assert_success
 
     ! Unit testing
-    integer, parameter :: OUTPUT_WIDTH = 132 ! Maximal width of the output
+    integer, public :: OUTPUT_WIDTH = 80 ! Maximal width of the output
     character(len=5), parameter :: indent = ""
     integer :: ntest = -1, nfail = -1
     character(len=32) :: module_name
@@ -57,12 +78,27 @@ module exception_handling_unit_test
     public :: unit_test_results
     public :: write_unit_test_report
     
+    ! Reports and exception types
+    ! 20110413 KP - Should become obsolete
     private :: assert_report
     interface assert_report
         module procedure assert_rank0_report
         module procedure assert_rank1_report
         module procedure assert_rank2_report
     end interface
+
+    type, extends(dbc_exception), public :: unit_test_exception
+        <xsl:value-of select="$ASSERT_OPTIONS_TYPEDECLARATION"/>
+    end type unit_test_exception
+
+<xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]">
+    type, extends(unit_test_exception) :: unit_test_exception_rank<xsl:value-of select="."/>
+        logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
+        character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b
+    contains
+        procedure :: info_message => unit_test_exception_info_message_rank<xsl:value-of select="."/>
+    end type unit_test_exception_rank<xsl:value-of select="."/>
+</xsl:for-each>
 
     ! Automatic generated
 <xsl:call-template name="interfaces"/>
@@ -166,7 +202,7 @@ contains<xsl:text/>
     end subroutine write_unit_test_report
 
     !--------------------------------------------------------------------------
-    ! Rank 0
+    ! Reporting
     !--------------------------------------------------------------------------
 
     subroutine assert_rank0_report( diff, a,b, <xsl:value-of select="$ASSERT_OPTIONS"/>, extra,extra_name )
@@ -180,10 +216,6 @@ contains<xsl:text/>
         write(unit=*,fmt="(2(A,I0),A)") " [??] elements differ"
 
     end subroutine assert_rank0_report
-
-    !--------------------------------------------------------------------------
-    ! Rank 1
-    !--------------------------------------------------------------------------
 
     subroutine assert_rank1_report( diff, a,b, <xsl:value-of select="$ASSERT_OPTIONS"/>, extra,extra_name, idx_row, recursion )
         logical, dimension(:), intent(in) :: diff
@@ -231,7 +263,7 @@ contains<xsl:text/>
             write(unit=*,fmt="(2(A,I0),A)") " [??] ", nb_diff, " of ", nb, " elements differ: "
         end if
 
-        max_row = (OUTPUT_WIDTH-name_width-len(sep))/w
+        max_row = (OUTPUT_WIDTH-name_width)/(w+len(sep))
         if( optional_logical( recursion,.false.) .or. (nb &lt;= max_row .and. .not. present(idx_row)) ) then
             if( nb &gt; max_row ) then
                 nb = max_row
@@ -334,10 +366,6 @@ contains<xsl:text/>
     
     end subroutine assert_rank1_report
 
-    !--------------------------------------------------------------------------
-    ! Rank 2
-    !-------------------------------------------------------------------------- 
-
     subroutine assert_rank2_report( diff, a,b, <xsl:value-of select="$ASSERT_OPTIONS"/>, extra,extra_name, idx_row, recursion )
         logical, dimension(:,:), intent(in) :: diff
         character(len=*), dimension(:,:), intent(in) :: a,b
@@ -384,6 +412,19 @@ contains<xsl:text/>
         write(unit=*,fmt=*) "" ! new line
     
     end subroutine assert_rank2_report
+
+    ! Type bound procedures
+<xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]"><xsl:text/>
+    subroutine unit_test_exception_info_message_rank<xsl:value-of select="."/>( info, message )
+        class(unit_test_exception_rank<xsl:value-of select="."/>), intent(in) :: info
+        character(len=*), intent(out) :: message
+        message = "TODO: add message here instead of outputting it straight away ..."
+        call assert_rank<xsl:value-of select="."/>_report( info%diff, info%a, info%b, &amp;
+                info%a_name,info%b_name,info%filename,info%line ) ! TODO: other arguments?
+    end subroutine unit_test_exception_info_message_rank<xsl:value-of select="."/>
+</xsl:for-each>
+	
+
 <xsl:call-template name="procedures"/>
 
     !--------------------------------------------------------------------------
@@ -475,6 +516,7 @@ end module exception_handling_unit_test<xsl:text/>
 		<xsl:if test="$rank &gt; 0"><xsl:text/>
 		integer :: <xsl:value-of select="$is"/>
 		</xsl:if>
+		type(unit_test_exception_rank<xsl:value-of select="$rank"/>) :: info
 
 		<xsl:call-template name="assert-array-shape"/>
 		if( <xsl:if test="$rank &gt; 0">all( </xsl:if><xsl:value-of select="$condition"/><xsl:if test="$rank &gt; 0"> )</xsl:if> ) then
@@ -496,7 +538,12 @@ end module exception_handling_unit_test<xsl:text/>
 					</xsl:for-each>
 				</xsl:otherwise>
 			</xsl:choose>
-			call assert_report( .not. ( <xsl:value-of select="$condition"/> ), a_str, b_str, <xsl:value-of select="$ASSERT_OPTIONS"/> )
+			
+			<xsl:call-template name="assert-options-typeassignment">
+				<xsl:with-param name="condition" select="$condition"/>
+			</xsl:call-template>
+			call create_exception( ifail, info )
+!			call assert_report( .not. ( <xsl:value-of select="$condition"/> ), a_str, b_str, <xsl:value-of select="$ASSERT_OPTIONS"/> )
 		end if
 	end subroutine <xsl:call-template name="name-mangler"/>
 		</xsl:for-each>

@@ -1,4 +1,4 @@
-FC=ifort
+FC=nagfor_beta
 
 # nagfor      = NAG Fortran Compiler Release 5.2(752)
 # nagfor_beta = NAG Fortran Compiler Release 5.3(820),5.2(762)
@@ -13,7 +13,7 @@ FFLAGS_gfortran_beta=$(FFLAGS_gfortran)
 FFLAGS_g95=-std=f2003 -fmod=$(LIBDIR)
 
 # ifort = ifort (IFORT) 11.0 20080930
-FFLAGS_ifort= -module $(LIBDIR) -fpp -free -Tf
+FFLAGS_ifort= -module $(LIBDIR) -fpp -g -check -warn -free -Tf
 
 
 
@@ -47,3 +47,8 @@ clean:
 veryclean: clean
 	$(RM) $(LIBRARY)
 	$(RM) -r $(LIBDIR)
+
+all: 
+	make FC=nagfor
+	make FC=nagfor_beta
+	make FC=ifort
