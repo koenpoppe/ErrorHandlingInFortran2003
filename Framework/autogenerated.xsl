@@ -14,8 +14,8 @@
 		<type format="ES13.5">real</type>
 		<type format="ES23.16">real(kind=kind(1.0d0))</type>
         <type format="A20">character(len=*)</type>
-        <!-- <type format="ES13.5">complex</type>
-        <type format="ES23.16">complex(kind=kind(1.0d0))</type> -->
+        <!-- <type format="ES13.5">complex</type> -->
+        <!-- <type format="ES23.16">complex(kind=kind(1.0d0))</type> -->
 	</xsl:variable>
 
 	<!-- The ranks that must be considered (0=scalar,1=array,2=matrix,...) -->
@@ -112,9 +112,9 @@
 	</xsl:template>
 	<xsl:template name="procedures">
 		<xsl:for-each select="*"><xsl:text/>
-    
+
     !--------------------------------------------------------------------------
-    ! <xsl:value-of select="name(.)"/>
+    ! Procedure <xsl:value-of select="name(.)"/>
 <xsl:if test="@comment">
     ! 
     ! <xsl:value-of select="@comment"/></xsl:if>

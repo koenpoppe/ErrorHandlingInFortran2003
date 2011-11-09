@@ -137,7 +137,7 @@ allflags:
 	$(MAKE) allversions_unsafe ALLTARGET=flags
 
 # TEMP
-unittest_test: unittest_test.o
+unittest_test: unittest_test.o unittest_test_driver.o
 	$(FC) -o $@ $^ $(LDFLAGS)
 test: unittest_test
 	./unittest_test
