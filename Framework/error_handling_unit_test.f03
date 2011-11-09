@@ -27,22 +27,21 @@ module error_handling_unit_test
     private
     save
 
-
-    ! Primitives
-    public :: assert
-    interface assert
-        module procedure assert_logical
-    end interface assert
-    
+    !--------------------------------------------------------------------------
     ! Unit testing
-    integer, public :: OUTPUT_WIDTH = 80 ! Maximal width of the output
-    integer :: ntest = -1, nfail = -1
-    character(len=32) :: module_name
-
+    !--------------------------------------------------------------------------
+    
+    ! Primitives
     public :: unit_test_reset
     public :: unit_test_results
     public :: write_unit_test_report
-
+    
+    ! Test statistics
+    integer :: OUTPUT_WIDTH = 132 ! Maximal width of the output
+    integer :: ntest = -1, nfail = -1
+    character(len=32) :: module_name
+    
+    ! Error info types
     type, extends(dbc_error), public :: unit_test_error
         character(:), allocatable :: statement, a_name,b_name,extra_name,filename, comment
         integer :: line = -1
@@ -67,7 +66,14 @@ module error_handling_unit_test
         procedure :: info_message => unit_test_error_info_message_rank2
     end type unit_test_error_rank2
 
-    ! Automatic generated
+    !--------------------------------------------------------------------------
+    ! Unit testing primitives
+    !--------------------------------------------------------------------------
+    
+    public :: assert
+    interface assert
+        module procedure assert_logical
+    end interface assert
 
     public :: assert_equal
     interface assert_equal
@@ -88,6 +94,12 @@ module error_handling_unit_test
         module procedure abserr_real_double_rank0
         module procedure abserr_real_double_rank1
         module procedure abserr_real_double_rank2
+        module procedure abserr_complex_rank0
+        module procedure abserr_complex_rank1
+        module procedure abserr_complex_rank2
+        module procedure abserr_complex_double_rank0
+        module procedure abserr_complex_double_rank1
+        module procedure abserr_complex_double_rank2
     end interface
     
     public :: assert_abserr
@@ -98,6 +110,12 @@ module error_handling_unit_test
         module procedure assert_abserr_real_double_rank0
         module procedure assert_abserr_real_double_rank1
         module procedure assert_abserr_real_double_rank2
+        module procedure assert_abserr_complex_rank0
+        module procedure assert_abserr_complex_rank1
+        module procedure assert_abserr_complex_rank2
+        module procedure assert_abserr_complex_double_rank0
+        module procedure assert_abserr_complex_double_rank1
+        module procedure assert_abserr_complex_double_rank2
     end interface
     
     public :: relerr
@@ -108,6 +126,12 @@ module error_handling_unit_test
         module procedure relerr_real_double_rank0
         module procedure relerr_real_double_rank1
         module procedure relerr_real_double_rank2
+        module procedure relerr_complex_rank0
+        module procedure relerr_complex_rank1
+        module procedure relerr_complex_rank2
+        module procedure relerr_complex_double_rank0
+        module procedure relerr_complex_double_rank1
+        module procedure relerr_complex_double_rank2
     end interface
     
     public :: assert_relerr
@@ -118,6 +142,12 @@ module error_handling_unit_test
         module procedure assert_relerr_real_double_rank0
         module procedure assert_relerr_real_double_rank1
         module procedure assert_relerr_real_double_rank2
+        module procedure assert_relerr_complex_rank0
+        module procedure assert_relerr_complex_rank1
+        module procedure assert_relerr_complex_rank2
+        module procedure assert_relerr_complex_double_rank0
+        module procedure assert_relerr_complex_double_rank1
+        module procedure assert_relerr_complex_double_rank2
     end interface
     
 contains
@@ -918,6 +948,66 @@ contains
             abs_err = 0
         end where
     end function abserr_real_double_rank2
+    function abserr_complex_rank0( a,b ) result( abs_err )
+        complex, intent(in) :: a
+        complex, intent(in) :: b
+        real :: abs_err
+        if( a/=b ) then
+            abs_err = abs(a-b)
+        else
+            abs_err = 0
+        end if
+    end function abserr_complex_rank0
+    function abserr_complex_rank1( a,b ) result( abs_err )
+        complex, dimension(:), intent(in) :: a
+        complex, dimension(size(a,1)), intent(in) :: b
+        real, dimension(size(a,1)) :: abs_err
+        where( a/=b )
+            abs_err = abs(a-b)
+        elsewhere
+            abs_err = 0
+        end where
+    end function abserr_complex_rank1
+    function abserr_complex_rank2( a,b ) result( abs_err )
+        complex, dimension(:,:), intent(in) :: a
+        complex, dimension(size(a,1),size(a,2)), intent(in) :: b
+        real, dimension(size(a,1),size(a,2)) :: abs_err
+        where( a/=b )
+            abs_err = abs(a-b)
+        elsewhere
+            abs_err = 0
+        end where
+    end function abserr_complex_rank2
+    function abserr_complex_double_rank0( a,b ) result( abs_err )
+        complex(kind=kind(1.0d0)), intent(in) :: a
+        complex(kind=kind(1.0d0)), intent(in) :: b
+        real(kind=kind(1.0d0)) :: abs_err
+        if( a/=b ) then
+            abs_err = abs(a-b)
+        else
+            abs_err = 0
+        end if
+    end function abserr_complex_double_rank0
+    function abserr_complex_double_rank1( a,b ) result( abs_err )
+        complex(kind=kind(1.0d0)), dimension(:), intent(in) :: a
+        complex(kind=kind(1.0d0)), dimension(size(a,1)), intent(in) :: b
+        real(kind=kind(1.0d0)), dimension(size(a,1)) :: abs_err
+        where( a/=b )
+            abs_err = abs(a-b)
+        elsewhere
+            abs_err = 0
+        end where
+    end function abserr_complex_double_rank1
+    function abserr_complex_double_rank2( a,b ) result( abs_err )
+        complex(kind=kind(1.0d0)), dimension(:,:), intent(in) :: a
+        complex(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)), intent(in) :: b
+        real(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)) :: abs_err
+        where( a/=b )
+            abs_err = abs(a-b)
+        elsewhere
+            abs_err = 0
+        end where
+    end function abserr_complex_double_rank2
 
     !--------------------------------------------------------------------------
     ! Procedure assert_abserr
@@ -1231,6 +1321,314 @@ contains
             call assertion_failed()
         end if
     end subroutine assert_abserr_real_double_rank2
+    subroutine assert_abserr_complex_rank0( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13) :: a_str, b_str, e_str
+        real :: e
+        type(unit_test_error_rank0) :: info
+        
+        e = abserr(a,b)
+        if( e <= epsabs ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            write(unit=a_str,fmt="(ES13.5)") a
+            write(unit=b_str,fmt="(ES13.5)") b
+            write(unit=e_str,fmt="(ES13.5)") e
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_rank0
+    subroutine assert_abserr_complex_rank1( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, dimension(:), intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13), dimension(size(a,1)) :: a_str, b_str, e_str
+        real, dimension(size(a,1)) :: e
+        integer :: i1
+        type(unit_test_error_rank1) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+                write(unit=a_str(i1),fmt="(ES13.5)") a(i1)
+                write(unit=b_str(i1),fmt="(ES13.5)") b(i1)
+                write(unit=e_str(i1),fmt="(ES13.5)") e(i1)
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_rank1
+    subroutine assert_abserr_complex_rank2( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, dimension(:,:), intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13), dimension(size(a,1),size(a,2)) :: a_str, b_str, e_str
+        real, dimension(size(a,1),size(a,2)) :: e
+        integer :: i1,i2
+        type(unit_test_error_rank2) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+            do i2=1,size(a,2)
+                write(unit=a_str(i1,i2),fmt="(ES13.5)") a(i1,i2)
+                write(unit=b_str(i1,i2),fmt="(ES13.5)") b(i1,i2)
+                write(unit=e_str(i1,i2),fmt="(ES13.5)") e(i1,i2)
+            end do
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_rank2
+    subroutine assert_abserr_complex_double_rank0( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)) :: e
+        type(unit_test_error_rank0) :: info
+        
+        e = abserr(a,b)
+        if( e <= epsabs ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            write(unit=a_str,fmt="(ES23.16)") a
+            write(unit=b_str,fmt="(ES23.16)") b
+            write(unit=e_str,fmt="(ES23.16)") e
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_double_rank0
+    subroutine assert_abserr_complex_double_rank1( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), dimension(:), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23), dimension(size(a,1)) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)), dimension(size(a,1)) :: e
+        integer :: i1
+        type(unit_test_error_rank1) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+                write(unit=a_str(i1),fmt="(ES23.16)") a(i1)
+                write(unit=b_str(i1),fmt="(ES23.16)") b(i1)
+                write(unit=e_str(i1),fmt="(ES23.16)") e(i1)
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_double_rank1
+    subroutine assert_abserr_complex_double_rank2( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), dimension(:,:), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23), dimension(size(a,1),size(a,2)) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)) :: e
+        integer :: i1,i2
+        type(unit_test_error_rank2) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+            do i2=1,size(a,2)
+                write(unit=a_str(i1,i2),fmt="(ES23.16)") a(i1,i2)
+                write(unit=b_str(i1,i2),fmt="(ES23.16)") b(i1,i2)
+                write(unit=e_str(i1,i2),fmt="(ES23.16)") e(i1,i2)
+            end do
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_abserr_complex_double_rank2
 
     !--------------------------------------------------------------------------
     ! Procedure relerr
@@ -1298,6 +1696,66 @@ contains
             rel_err = 0
         end where
     end function relerr_real_double_rank2
+    function relerr_complex_rank0( a,b ) result( rel_err )
+        complex, intent(in) :: a
+        complex, intent(in) :: b
+        complex :: rel_err
+        if( a/=b ) then
+            rel_err = abs((a-b)/a)
+        else
+            rel_err = 0
+        end if
+    end function relerr_complex_rank0
+    function relerr_complex_rank1( a,b ) result( rel_err )
+        complex, dimension(:), intent(in) :: a
+        complex, dimension(size(a,1)), intent(in) :: b
+        complex, dimension(size(a,1)) :: rel_err
+        where( a/=b )
+            rel_err = abs((a-b)/a)
+        elsewhere
+            rel_err = 0
+        end where
+    end function relerr_complex_rank1
+    function relerr_complex_rank2( a,b ) result( rel_err )
+        complex, dimension(:,:), intent(in) :: a
+        complex, dimension(size(a,1),size(a,2)), intent(in) :: b
+        complex, dimension(size(a,1),size(a,2)) :: rel_err
+        where( a/=b )
+            rel_err = abs((a-b)/a)
+        elsewhere
+            rel_err = 0
+        end where
+    end function relerr_complex_rank2
+    function relerr_complex_double_rank0( a,b ) result( rel_err )
+        complex(kind=kind(1.0d0)), intent(in) :: a
+        complex(kind=kind(1.0d0)), intent(in) :: b
+        complex(kind=kind(1.0d0)) :: rel_err
+        if( a/=b ) then
+            rel_err = abs((a-b)/a)
+        else
+            rel_err = 0
+        end if
+    end function relerr_complex_double_rank0
+    function relerr_complex_double_rank1( a,b ) result( rel_err )
+        complex(kind=kind(1.0d0)), dimension(:), intent(in) :: a
+        complex(kind=kind(1.0d0)), dimension(size(a,1)), intent(in) :: b
+        complex(kind=kind(1.0d0)), dimension(size(a,1)) :: rel_err
+        where( a/=b )
+            rel_err = abs((a-b)/a)
+        elsewhere
+            rel_err = 0
+        end where
+    end function relerr_complex_double_rank1
+    function relerr_complex_double_rank2( a,b ) result( rel_err )
+        complex(kind=kind(1.0d0)), dimension(:,:), intent(in) :: a
+        complex(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)), intent(in) :: b
+        complex(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)) :: rel_err
+        where( a/=b )
+            rel_err = abs((a-b)/a)
+        elsewhere
+            rel_err = 0
+        end where
+    end function relerr_complex_double_rank2
 
     !--------------------------------------------------------------------------
     ! Procedure assert_relerr
@@ -1611,6 +2069,314 @@ contains
             call assertion_failed()
         end if
     end subroutine assert_relerr_real_double_rank2
+    subroutine assert_relerr_complex_rank0( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13) :: a_str, b_str, e_str
+        real :: e
+        type(unit_test_error_rank0) :: info
+        
+        e = abserr(a,b)
+        if( e <= epsabs ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            write(unit=a_str,fmt="(ES13.5)") a
+            write(unit=b_str,fmt="(ES13.5)") b
+            write(unit=e_str,fmt="(ES13.5)") e
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_rank0
+    subroutine assert_relerr_complex_rank1( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, dimension(:), intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13), dimension(size(a,1)) :: a_str, b_str, e_str
+        real, dimension(size(a,1)) :: e
+        integer :: i1
+        type(unit_test_error_rank1) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+                write(unit=a_str(i1),fmt="(ES13.5)") a(i1)
+                write(unit=b_str(i1),fmt="(ES13.5)") b(i1)
+                write(unit=e_str(i1),fmt="(ES13.5)") e(i1)
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_rank1
+    subroutine assert_relerr_complex_rank2( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex, dimension(:,:), intent(in) :: a,b
+        real, intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=13), dimension(size(a,1),size(a,2)) :: a_str, b_str, e_str
+        real, dimension(size(a,1),size(a,2)) :: e
+        integer :: i1,i2
+        type(unit_test_error_rank2) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+            do i2=1,size(a,2)
+                write(unit=a_str(i1,i2),fmt="(ES13.5)") a(i1,i2)
+                write(unit=b_str(i1,i2),fmt="(ES13.5)") b(i1,i2)
+                write(unit=e_str(i1,i2),fmt="(ES13.5)") e(i1,i2)
+            end do
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_rank2
+    subroutine assert_relerr_complex_double_rank0( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)) :: e
+        type(unit_test_error_rank0) :: info
+        
+        e = abserr(a,b)
+        if( e <= epsabs ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            write(unit=a_str,fmt="(ES23.16)") a
+            write(unit=b_str,fmt="(ES23.16)") b
+            write(unit=e_str,fmt="(ES23.16)") e
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_double_rank0
+    subroutine assert_relerr_complex_double_rank1( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), dimension(:), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23), dimension(size(a,1)) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)), dimension(size(a,1)) :: e
+        integer :: i1
+        type(unit_test_error_rank1) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+                write(unit=a_str(i1),fmt="(ES23.16)") a(i1)
+                write(unit=b_str(i1),fmt="(ES23.16)") b(i1)
+                write(unit=e_str(i1),fmt="(ES23.16)") e(i1)
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_double_rank1
+    subroutine assert_relerr_complex_double_rank2( a, b, epsabs, &
+                            a_name,b_name,filename,line,comment, ifail )
+        complex(kind=kind(1.0d0)), dimension(:,:), intent(in) :: a,b
+        real(kind=kind(1.0d0)), intent(in) :: epsabs
+        character(len=*), intent(in), optional :: a_name,b_name,filename,comment
+        integer, intent(in), optional :: line
+        type(error), intent(out), optional :: ifail
+        
+        ! Local variables
+        character(len=23), dimension(size(a,1),size(a,2)) :: a_str, b_str, e_str
+        real(kind=kind(1.0d0)), dimension(size(a,1),size(a,2)) :: e
+        integer :: i1,i2
+        type(unit_test_error_rank2) :: info
+        
+        ! Ensure the correct array sizes TODO: precondition
+        if( .not. assert_array_shape( shape(a),shape(b), &
+                            a_name,b_name,filename,line,comment, ifail ) ) return
+        
+        e = abserr(a,b)
+        if( all( e <= epsabs ) ) then
+            call assertion_succeeded()
+        else
+            ! Export the data as character string
+            do i1=1,size(a,1)
+            do i2=1,size(a,2)
+                write(unit=a_str(i1,i2),fmt="(ES23.16)") a(i1,i2)
+                write(unit=b_str(i1,i2),fmt="(ES23.16)") b(i1,i2)
+                write(unit=e_str(i1,i2),fmt="(ES23.16)") e(i1,i2)
+            end do
+            end do
+            
+            ! Populate common info
+            info%filename = optional_character( filename, "" )
+            info%comment = optional_character( comment, "" )
+            info%line = optional_integer( line, -1 )
+            
+            ! Populate error_info type specific for this rank
+            info%statement = "e <= epsabs"
+            info%diff = .not. ( e <= epsabs )
+            info%a = a_str
+            info%b = b_str
+            info%a_name = optional_character( a_name, "a" )
+            info%b_name = optional_character( b_name, "b" )
+            
+            ! TODO: check class invariants info
+            
+            ! Populate additional information
+            info%extra = e_str
+            info%extra_name = "abserr"
+            
+            ! Create the error and report failed
+            call create_error( ifail, info )
+            call assertion_failed()
+        end if
+    end subroutine assert_relerr_complex_double_rank2
 
 
     !--------------------------------------------------------------------------

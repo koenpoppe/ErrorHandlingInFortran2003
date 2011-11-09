@@ -75,23 +75,22 @@ module error_handling_unit_test
     implicit none
     private
     save
-<xsl:text/>
 
-    ! Primitives
-    public :: assert
-    interface assert
-        module procedure assert_logical
-    end interface assert
-    
+    !--------------------------------------------------------------------------
     ! Unit testing
-    integer, public :: OUTPUT_WIDTH = 80 ! Maximal width of the output
-    integer :: ntest = -1, nfail = -1
-    character(len=32) :: module_name
-
+    !--------------------------------------------------------------------------
+    
+    ! Primitives
     public :: unit_test_reset
     public :: unit_test_results
     public :: write_unit_test_report
-
+    
+    ! Test statistics
+    integer :: OUTPUT_WIDTH = 132 ! Maximal width of the output
+    integer :: ntest = -1, nfail = -1
+    character(len=32) :: module_name
+    
+    ! Error info types
     type, extends(dbc_error), public :: unit_test_error
         <xsl:value-of select="$ASSERT_OPTIONS_TYPEDECLARATION"/>
     end type unit_test_error
@@ -104,7 +103,14 @@ module error_handling_unit_test
     end type unit_test_error_rank<xsl:value-of select="."/>
 </xsl:for-each>
 
-    ! Automatic generated
+    !--------------------------------------------------------------------------
+    ! Unit testing primitives
+    !--------------------------------------------------------------------------
+    
+    public :: assert
+    interface assert
+        module procedure assert_logical
+    end interface assert
 <xsl:call-template name="interfaces"/>
 contains<xsl:text/>
 
@@ -676,6 +682,10 @@ end module error_handling_unit_test<xsl:text/>
 		</xsl:for-each>
 	</xsl:template>
 	
+	<xsl:template name="real-type">
+<xsl:value-of select="str:replace(@type,'complex','real')"/>
+	</xsl:template>
+	
 	<xsl:template match="abserr">
 		<xsl:param name="version"/>
 		<xsl:for-each select="exsl:node-set($version)">
@@ -683,7 +693,7 @@ end module error_handling_unit_test<xsl:text/>
     function <xsl:call-template name="name-mangler"/>( a,b ) result( abs_err )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification-equal"/>, intent(in) :: b
-        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification-equal"/> :: abs_err<xsl:text/>
+        <xsl:call-template name="real-type"/><xsl:call-template name="rank-specification-equal"/> :: abs_err<xsl:text/>
         <xsl:choose>
         	<xsl:when test="@rank = 0">
         if( a/=b ) then
@@ -732,7 +742,7 @@ end module error_handling_unit_test<xsl:text/>
 			</xsl:variable>
     subroutine <xsl:call-template name="name-mangler"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b
-        <xsl:value-of select="@type"/>, intent(in) :: <xsl:value-of select="$err_tol"/><xsl:text/>
+        <xsl:call-template name="real-type"/>, intent(in) :: <xsl:value-of select="$err_tol"/><xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         
         ! Local variables
@@ -744,7 +754,7 @@ end module error_handling_unit_test<xsl:text/>
 			</xsl:for-each>)<xsl:text/>
 		</xsl:if>
 		<xsl:text/> :: a_str, b_str, e_str
-        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification-equal"/> :: e<xsl:text/>
+        <xsl:call-template name="real-type"/><xsl:call-template name="rank-specification-equal"/> :: e<xsl:text/>
 		<xsl:if test="$rank &gt; 0"><xsl:text/>
         integer :: <xsl:value-of select="$is"/>
 		</xsl:if>
