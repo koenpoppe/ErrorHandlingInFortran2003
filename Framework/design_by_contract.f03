@@ -27,6 +27,8 @@ module design_by_contract
 
     ! 1. General Design by Contract error
     type, extends(message_error), public :: dbc_error
+        character(:), allocatable :: statement, comment, filename
+        integer :: line = -1
     contains
         procedure :: info_message => error_info_message_dbc_error
     end type dbc_error

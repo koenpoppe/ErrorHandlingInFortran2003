@@ -155,6 +155,24 @@
 			</xsl:for-each>)<xsl:text/>
 		</xsl:if>
 	</xsl:template>
+	<xsl:template name="deferred-rank-specification-equal">
+		<xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
+		<xsl:if test="$rank &gt; 0">
+			<xsl:text/>, dimension(<xsl:text/>
+			<xsl:for-each select="exsl:node-set($ranks)/*[ 0 &lt; . and . &lt;= $rank]">
+				<xsl:text/><xsl:if test=". &gt; 1">,</xsl:if>:<xsl:text/>
+			</xsl:for-each>)<xsl:text/>
+		</xsl:if>
+	</xsl:template>
+	<xsl:template name="shape-specification-equal">
+		<xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
+		<xsl:if test="$rank &gt; 0">
+			<xsl:text/>(<xsl:text/>
+			<xsl:for-each select="exsl:node-set($ranks)/*[ 0 &lt; . and . &lt;= $rank]">
+				<xsl:text/><xsl:if test=". &gt; 1">,</xsl:if>size(a,<xsl:value-of select="."/>)<xsl:text/>
+			</xsl:for-each>)<xsl:text/>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template name="module-procedure"><xsl:text>
         module procedure </xsl:text>	<xsl:call-template name="name-mangler"/>
@@ -174,6 +192,12 @@
 		<xsl:variable name="type" select="@type"/>
 		<xsl:for-each select="exsl:node-set($types)/type[ . = $type]">
 			<xsl:value-of select="@format"/>
+		</xsl:for-each>
+	</xsl:template>
+	<xsl:template name="type-format-w-optional">
+		<xsl:variable name="type" select="@type"/>
+		<xsl:for-each select="exsl:node-set($types)/type[ . = $type]">
+			<xsl:text/>"//optional_character(fmt,"<xsl:value-of select="@format"/>")//"<xsl:text/>
 		</xsl:for-each>
 	</xsl:template>
 

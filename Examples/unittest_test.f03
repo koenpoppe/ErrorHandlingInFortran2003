@@ -47,20 +47,20 @@ contains
     subroutine scalar()
         type(error) :: inform
 
-        call assert_equal( .true., .true., ifail=inform )
+        call assert_eq( .true., .true., ifail=inform )
         call my_report_error( inform, "logical, equal" )
-        call assert_equal( .true., .false., ifail=inform )
+        call assert_eq( .true., .false., ifail=inform )
         call my_report_error( inform, "logical, different" )
 
-        call assert_equal( 1, 1, ifail=inform )
+        call assert_eq( 1, 1, ifail=inform )
         call my_report_error( inform, "integer, equal" )
-        call assert_equal( 1, 2, ifail=inform )
+        call assert_eq( 1, 2, ifail=inform )
         call my_report_error( inform, "integer, different" )
 
-        call assert_equal( "a", "b", ifail=inform )
+        call assert_eq( "a", "b", ifail=inform )
         call my_report_error( inform, "character(len=1)" )
 
-        call assert_equal( "abcbcan", "bbcbacn", ifail=inform )
+        call assert_eq( "abcbcan", "bbcbacn", ifail=inform )
         call my_report_error( inform, "character(len>1)" )
 
     end subroutine scalar
@@ -68,18 +68,18 @@ contains
     subroutine short_vector()
         type(error) :: inform
         
-        call assert_equal( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
+        call assert_eq( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
         call my_report_error( inform, comment="short_vector, equal" )
         
         ! Special
-        call assert_equal( (/ 1,2,3 /), (/ 1,2,3,5 /), ifail=inform )
+        call assert_eq( (/ 1,2,3 /), (/ 1,2,3,5 /), ifail=inform )
         call my_report_error( inform, comment="short_vector, different length" )
 
         ! small array: show all
-        call assert_equal( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
+        call assert_eq( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
         call my_report_error( inform, comment="short_vector, equal" )
         
-        call assert_equal( (/ 1,2,3 /), (/ 3,2,1 /), ifail=inform )
+        call assert_eq( (/ 1,2,3 /), (/ 3,2,1 /), ifail=inform )
         call my_report_error( inform, comment="short_vector, show all" )
 
     end subroutine short_vector
@@ -90,33 +90,33 @@ contains
         
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, compress middle" )
         
         ! large number: compress equal parts and show indexes
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 3,1,9,9,9,9,9,9,9,9,9,9,2 /)
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, compress middle" )
         
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 3,2,8,9,7,9,9,9,3,9,9,9,2 /)
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, compress middle" )
 
         A = (/ 9,9,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 9,9,9,9,9,9,9,9,9,9,9,9,4 /)
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, compress leading" )
 
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,9 /)
         B = (/ 2,2,9,9,9,9,9,9,9,9,9,9,9 /)
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, compress trailing" )
         
-        A = (/ 1,2,3,4,5,6,7,8,9,8,7,6,5 /)
-        B = (/ 2,2,9,9,9,9,9,9,9,9,9,9,9 /)
-        call assert_equal( A,B, ifail=inform )
+        A = (/ 1,2,3,4,5,6,7,8,9,8,7,6,5,4,5,6 /)
+        B = (/ 2,2,9,9,9,9,9,9,9,9,9,9,9,3,5,3 /)
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_vector, truncated" )
         
     end subroutine large_vector
@@ -128,38 +128,38 @@ contains
         
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, equal" )
         
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 1,2,9,9,9,3 /),(/2,3/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, different size" )
         
         ! large matrix: compress equal parts and show indexes
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 3,1,9,9,9,2 /),(/3,2/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, short" )
 
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,3 /),(/4,3/))
         B = reshape((/ 3,1,9,9,9,9,9,9,9,9,9,2 /),(/4,3/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, compress middle" )
         
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,3,1,2,3 /),(/5,3/))
         B = reshape((/ 3,2,9,9,9,9,9,9,9,9,9,3,2,2,4 /),(/5,3/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, compress several" )
 
         A = reshape((/ 9,9,9,9,9,9,9,9,9,9,9,3 /),(/4,3/))
         B = reshape((/ 9,9,9,9,9,9,9,9,9,9,9,4 /),(/4,3/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, compress leading" )
 
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,9 /),(/4,3/))
         B = reshape((/ 1,2,8,9,9,9,9,9,9,9,9,9 /),(/4,3/))
-        call assert_equal( A,B, ifail=inform )
+        call assert_eq( A,B, ifail=inform )
         call my_report_error( inform, "large_matrix, compress trailing" )
         
     end subroutine large_matrix

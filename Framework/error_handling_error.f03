@@ -52,6 +52,8 @@ module error_handling_error
         final :: error_final
 #endif
     end type error
+    
+    public :: is_error
 
     ! 3. Sentinel no-error information type
     type, extends(error_info), public :: no_error

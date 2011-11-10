@@ -16,7 +16,7 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-#include "error_handling.h"
+#include "error_handling_oldnew.h"
 
 module fragile_input
 

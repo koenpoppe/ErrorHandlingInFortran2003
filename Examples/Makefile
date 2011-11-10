@@ -11,7 +11,7 @@ LIBRARY=-lerror_handling
 FC=nagfor_beta
 FPP=$(FC)
 
-FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90
+FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90 -u
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 
 FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
@@ -101,7 +101,7 @@ doc: $(SOURCE_LIST)
 	@rm docsourcelist
 
 # How to clean up the mess
-veryclean: clean cleandrivers cleanpreprocs cleanlogs
+veryclean: clean cleandrivers cleanpreprocs cleanlogs cleanothers
 
 # Collectives
 ALLTARGET=one
@@ -136,8 +136,18 @@ flags:
 allflags:
 	$(MAKE) allversions_unsafe ALLTARGET=flags
 
-# TEMP
+# Others
 unittest_test: unittest_test.o unittest_test_driver.o
 	$(FC) -o $@ $^ $(LDFLAGS)
-test: unittest_test
-	./unittest_test
+
+
+dbc_test_pp.f03: dbc_test.f03 ../Framework/error_handling_preprocessing.h
+	cpp dbc_test.f03 > $@
+dbc_test: dbc_test_pp.f03
+	$(FC) -o $@ $^ $(LDFLAGS) $(FFLAGS)
+
+test: dbc_test
+	./dbc_test
+
+cleanothers:
+	$(RM) unittest_test dbc_test
