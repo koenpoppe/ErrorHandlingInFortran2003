@@ -47,7 +47,7 @@ module error_handling_error
         character(:), allocatable :: method
         type(error), pointer :: reason => NULL()
         logical, private :: handled = .false.
-#ifdef FC_SUPP_FINAL
+#ifndef FC_NO_FINAL_SUPPORT
     contains
         final :: error_final
 #endif
@@ -101,7 +101,7 @@ contains
     ! Derived types
     !--------------------------------------------------------------------------
 
-#ifdef FC_SUPP_FINAL
+#ifndef FC_NO_FINAL_SUPPORT
     ! 1. Errors itself
     recursive subroutine error_final( exc )
         type(error),intent(in out) :: exc

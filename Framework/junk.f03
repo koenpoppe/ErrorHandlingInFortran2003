@@ -65,7 +65,7 @@ contains
         class(error_info), intent(in) :: exc, cxe
         logical :: equal
 
-#ifdef FC_SUPP_SAME_TYPE_AS
+#ifndef FC_NO_SAME_TYPE_AS_SUPPORT
         if( .not. SAME_TYPE_AS( exc, cxe ) ) then
             equal = .false.
         else
@@ -73,7 +73,7 @@ contains
             equal = .true. ! TODO
         end if
 #else
-        print *, "error_info_eq_error_info: no FC_SUPP_SAME_TYPE_AS"
+        print *, "error_info_eq_error_info: no FC_NO_SAME_TYPE_AS_SUPPORT"
         equal = .true.
 #endif
         
