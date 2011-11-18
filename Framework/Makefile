@@ -12,15 +12,18 @@ FFLAGS_nagfor_beta+=-O0 -C=all -g90
 FFLAGS_nagfor=$(FFLAGS_nagfor_beta)
 
 ###############################################################################
-# gfortran = GNU Fortran (Ubuntu 4.4.3-4ubuntu5) 4.4.3
-#    - very limited support for f2003
-FFLAGS_gfortran=-std=f2008 
-FFLAGS_gfortran+=-J $(LIBDIR)
-FFLAGS_gfortran+=-DFC_NO_FINAL_SUPPORT -DFC_NO_SAME_TYPE_AS_SUPPORT
-FFLAGS_gfortran+=-O0 -g
+# gfortran = GNU Fortran (GCC) 4.7.0 20111013 (experimental)
+#    - no finalisation yet
+#    - gfortran_beta -c -std=f2008  -J gfortran_beta_build/ -cpp -O0 -g -DFC_NO_FINAL_SUPPORT error_handling_error.f03
+#      f951: internal compiler error: in gfc_get_derived_type, at fortran/trans-types.c:2394
+FFLAGS_gfortran_beta=-std=f2008 
+FFLAGS_gfortran_beta+=-J $(LIBDIR) -cpp
+FFLAGS_gfortran_beta+=-O0 -g
+FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT
 
-# gfortran_beta = GNU Fortran (GCC) 4.7.0 20110326 (experimental)
-FFLAGS_gfortran_beta=$(FFLAGS_gfortran)
+# (old) gfortran = GNU Fortran (Ubuntu 4.4.3-4ubuntu5) 4.4.3
+#    - very limited support for f2003
+FFLAGS_gfortran=$(FFLAGS_gfortran_beta) -DFC_NO_SAME_TYPE_AS_SUPPORT
 
 ###############################################################################
 # g95 = G95 (GCC 4.0.3 (g95 0.92!) Jun  3 2009)
@@ -28,10 +31,17 @@ FFLAGS_gfortran_beta=$(FFLAGS_gfortran)
 FFLAGS_g95=-std=f2003 -fmod=$(LIBDIR) -DFC_NO_FINAL_SUPPORT
 
 ###############################################################################
+# ifort = ifort_beta (IFORT) 12.1.0 20111011
+#    - /tmp/ifort_betaewX8Q5.i: catastrophic error: **Internal compiler error: segmentation violation signal raised** Please report this error along with the circumstances in which it occurred in a Software Problem Report.  Note: File and line given may not be explicit cause of this error. compilation aborted for error_handling_unit_test.f03 (code 1)
+
+FFLAGS_ifort_beta= -module $(LIBDIR) -fpp -g -check -warn 
+FFLAGS_ifort_beta+=-free -Tf
+
 # ifort = ifort (IFORT) 12.0.2 20110112
 #    - no support for SELECT TYPE
 #    - no support for ALLOCATE( ... source=... )
-FFLAGS_ifort= -module $(LIBDIR) -fpp -g -check -warn -DFC_NO_FINAL_SUPPORT -DFC_NO_SAME_TYPE_AS_SUPPORT -free -Tf
+FFLAGS_ifort=$(FFLAGS_ifort_beta)
+FFLAGS_ifort+=-DFC_NO_FINAL_SUPPORT -DFC_NO_SAME_TYPE_AS_SUPPORT
 
 ###############################################################################
 

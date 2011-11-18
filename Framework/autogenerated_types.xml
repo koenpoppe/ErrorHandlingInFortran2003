@@ -6,10 +6,10 @@
     <type format="I5">integer(kind=selected_int_kind(4))</type>
     <type format="I10">integer(kind=selected_int_kind(9))</type>
     <type format="I19">integer(kind=selected_int_kind(18))</type>
-    <type format="ES11.6">real(kind=selected_real_kind(6,37))</type>
-    <type format="ES11.6">complex(kind=selected_real_kind(6,37))</type>
-    <type format="ES21.15">real(kind=selected_real_kind(15,307))</type>
-    <type format="ES21.15">complex(kind=selected_real_kind(15,307))</type>
-    <type format="ES37.31">real(kind=selected_real_kind(31,291))</type>
-    <type format="ES37.31">complex(kind=selected_real_kind(31,291))</type>
+    <type format="ES13.6">real(kind=selected_real_kind(6,37))</type>
+    <type format="ES13.6">complex(kind=selected_real_kind(6,37))</type>
+    <type format="ES22.15">real(kind=selected_real_kind(15,307))</type>
+    <type format="ES22.15">complex(kind=selected_real_kind(15,307))</type>
+    <type format="ES38.31">real(kind=selected_real_kind(31,291))</type>
+    <type format="ES38.31">complex(kind=selected_real_kind(31,291))</type>
 </types>

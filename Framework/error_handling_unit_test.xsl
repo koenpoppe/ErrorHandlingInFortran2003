@@ -21,6 +21,8 @@
         type(error), intent(out), optional :: ifail<xsl:text/>
     </xsl:variable>
 	<xsl:variable name="ASSERT_OPTIONS_TYPEDECLARATION">
+        character(:), allocatable :: statement, comment, filename
+        integer :: line = -1
         <xsl:text/>character(:), allocatable :: a_name,b_name,extra_name
         logical :: show_difference_marks = .false.
     </xsl:variable>
@@ -77,7 +79,7 @@
 !
 module error_handling_unit_test
     use error_handling_error
-    use design_by_contract
+    ! use design_by_contract
     implicit none
     private
     save
@@ -97,7 +99,7 @@ module error_handling_unit_test
     character(len=32) :: module_name = ""
     
     ! Error info types
-    type, extends(dbc_error), public :: unit_test_error
+    type, extends(message_error), public :: unit_test_error
         <xsl:value-of select="$ASSERT_OPTIONS_TYPEDECLARATION"/>
     end type unit_test_error
 <xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]">
@@ -859,7 +861,7 @@ end module error_handling_unit_test<xsl:text/>
 				</xsl:otherwise>
 			</xsl:choose>
             
-            write(unit=<xsl:value-of select="$err_tol"/>_str,fmt="(ES7.1)") <xsl:value-of select="$err_tol"/>
+            write(unit=<xsl:value-of select="$err_tol"/>_str,fmt="(ES8.1)") <xsl:value-of select="$err_tol"/>
 			<xsl:call-template name="assert-options-typeassignment">
                 <xsl:with-param name="condition">e &lt;= <xsl:value-of select="$err_tol"/></xsl:with-param>
                 <xsl:with-param name="condition-str">
