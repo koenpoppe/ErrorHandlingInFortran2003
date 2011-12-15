@@ -1,4 +1,4 @@
-FC=nagfor_beta
+FC=gfortran_beta
 
 ###############################################################################
 # nagfor_beta = NAG Fortran Compiler Release 5.3(842)
@@ -19,7 +19,7 @@ FFLAGS_nagfor=$(FFLAGS_nagfor_beta)
 FFLAGS_gfortran_beta=-std=f2008 
 FFLAGS_gfortran_beta+=-J $(LIBDIR) -cpp
 FFLAGS_gfortran_beta+=-O0 -g
-FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT
+FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_CHARACTER
 
 # (old) gfortran = GNU Fortran (Ubuntu 4.4.3-4ubuntu5) 4.4.3
 #    - very limited support for f2003

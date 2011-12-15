@@ -42,14 +42,24 @@ module lin_solve
     
 #ifdef ERROR_HANDLING
     type, extends(error_info) :: argument_error
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: name, actual_value
         character(:), allocatable :: allowed_values
+#else
+        character(len=MAX_CHARACTER_LEN) :: name = "", actual_value = ""
+        character(len=MAX_CHARACTER_LEN) :: allowed_values = ""
+#endif
     contains
         procedure :: info_message => error_info_message_argument_error
     end type argument_error
     
     type, extends(error_info) :: illconditioned_error
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: name
+#else
+        character(len=MAX_CHARACTER_LEN) :: name = ""
+#endif
+        
         real(kind=wp) :: lambda_min, lambda_max
     contains
         procedure :: info_message => error_info_message_illconditioned_error
@@ -118,8 +128,8 @@ contains
         character(len=*), intent(in) :: prefix, suffix
         
         write(unit=unit,fmt="(9A)") prefix, & 
-            "Argument ", info%name, "='", info%actual_value, "' is invalid. ", & 
-            "The value must be one of the following: ", info%allowed_values, suffix
+            "Argument ", trim(info%name), "='", trim(info%actual_value), "' is invalid. ", & 
+            "The value must be one of the following: ", trim(info%allowed_values), suffix
         
     end subroutine error_info_message_argument_error
     
@@ -130,11 +140,11 @@ contains
         
         if( info%lambda_min == 0.0_wp ) then
             write(unit=unit,fmt="(5A)") prefix, &
-                "The matrix ", info%name, " is exactly singular", suffix
+                "The matrix ", trim(info%name), " is exactly singular", suffix
         else
             write(unit=unit,fmt="(7A,ES10.3,A)") prefix, & 
-                "The matrix ", info%name, " is ill conditioned: ", &
-                "1/cond(", info%name, ")=", info%lambda_min/info%lambda_max, suffix
+                "The matrix ", trim(info%name), " is ill conditioned: ", &
+                "1/cond(", trim(info%name), ")=", info%lambda_min/info%lambda_max, suffix
         end if
         
     end subroutine error_info_message_illconditioned_error

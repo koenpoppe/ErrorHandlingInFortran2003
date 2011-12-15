@@ -57,7 +57,11 @@ contains
         call allocate_workspace( N*N*N, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 1."
-            deallocate(workspace)
+            if( allocated(workspace) ) then
+                deallocate(workspace)
+            else
+                print *, "*** KP: not allocated ???", N*N*N
+            end if
 #ifndef ERROR_HANDLING
             if( present(ifail) ) then
                 ifail = 0 ! success
@@ -76,7 +80,11 @@ contains
         call allocate_workspace( N*N, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 2."
-            deallocate(workspace)
+            if( allocated(workspace) ) then
+                deallocate(workspace)
+            else
+                print *, "*** KP: not allocated ???", N*N
+            end if
 #ifndef ERROR_HANDLING
             if( present(ifail) ) then
                 ifail = 0 ! success
@@ -105,7 +113,11 @@ contains
             call allocate_workspace( N, inform )
             if( inform == 0 ) then
                 write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 3."
-                deallocate(workspace)
+                if( allocated(workspace) ) then
+                    deallocate(workspace)
+                else
+                    print *, "*** KP: not allocated ???", N
+                end if
 #ifndef ERROR_HANDLING
                 if( present(ifail) ) then
                     ifail = 0 ! success
@@ -137,7 +149,7 @@ contains
         ! Local arguments
         integer :: stat
         integer, parameter :: workspace_bound = 1000000
-                
+        
         ! Enforce a fixed memory bound
         if( workspace_size > workspace_bound ) then
 #ifdef ERROR_HANDLING

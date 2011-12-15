@@ -42,9 +42,16 @@ module error_handling_error
     end type error_info
 
     ! 2. Errors itself
+#ifdef FC_NO_ALLOCATABLE_CHARACTER
+    integer, parameter, public :: MAX_CHARACTER_LEN=1024
+#endif
     type, public :: error
         class(error_info), pointer :: info => NULL()
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: method
+#else
+        character(len=MAX_CHARACTER_LEN) :: method = ""
+#endif
         type(error), pointer :: reason => NULL()
         logical, private :: handled = .false.
 #ifndef FC_NO_FINAL_SUPPORT
@@ -63,7 +70,11 @@ module error_handling_error
     
     ! 4. Message error information type
     type, extends(error_info), public :: message_error
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: message
+#else
+        character(len=MAX_CHARACTER_LEN) :: message = ""
+#endif
     contains
         procedure :: info_message => message_error_info_message
     end type message_error
@@ -145,7 +156,11 @@ contains
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
 
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         if( allocated(info%message) ) then ! TODO precondition
+#else
+        if( len_trim(info%message) > 0 ) then
+#endif
             write(unit=unit,fmt="(3A)") prefix, &
                 trim(info%message), suffix
         else
@@ -334,9 +349,16 @@ contains
         else
             write(unit=REPORT_UNIT,fmt="(A)",advance="no") " ** cascading"
         end if
-        
-        if( allocated(exc%method )) &
+
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
+        if( allocated(exc%method) ) &
             write(unit=REPORT_UNIT,fmt="(3A)",advance="no") " from '", exc%method, "'"
+#else
+        if( len_trim(exc%method) > 0 ) &
+            write(unit=REPORT_UNIT,fmt="(3A)",advance="no") " from '", trim(exc%method), "'"
+#endif
+            
+            
         write(unit=REPORT_UNIT,fmt="(A)") ":"
         
         if( associated(exc%info) ) then
@@ -372,10 +394,14 @@ contains
             allocate( ifail%info, source=inform%info ) ! 20111107 KP (see HISTORY)
             nullify( inform%info )
         end if
-        
+
+#ifndef FC_NO_FINAL_SUPPORT
         if( allocated(inform%method) ) then
             ifail%method = inform%method
         end if
+#else
+        ifail%method = inform%method
+#endif
         
         if( associated(inform%reason) ) then
             allocate( ifail%reason )

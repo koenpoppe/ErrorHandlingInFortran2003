@@ -42,7 +42,11 @@ module fragile_input
 #ifdef ERROR_HANDLING
     type, extends(error_info) :: fragile_input_error
         integer :: nb_attempts
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: input_type
+#else
+        character(MAX_CHARACTER_LEN) :: input_type = ""
+#endif
     contains
         procedure, pass :: info_message => error_info_message_fragile_input_error
     end type fragile_input_error
@@ -83,8 +87,10 @@ contains
         ! Optional number of attempts
         if( present(nb_attempts) ) then
 #ifdef ERROR_HANDLING
-            if( precondition_fails(ifail,nb_attempts>=1, &
-                "<nb_attempts> must be positive") ) return ! TODO: shorter
+            call assert_gt( nb_attempts, 1, "<nb_attempts> must be positive", ifail )
+            if( ifail /= 0 ) return
+!             if( precondition_fails(ifail,nb_attempts>=1, &
+!                 "<nb_attempts> must be positive") ) return ! TODO: shorter
 #else
             if( nb_attempts<1 ) then
                 call handle_error( 5000, ifail )
@@ -126,7 +132,7 @@ contains
                     ! We allow a new trail, so discard the error
                     call discard_error( inform )
 #endif
-                    if( verbose ) then
+                    if( lverbose ) then
                         write(unit=*,fmt="(A,I0,A)",advance="no") &
                             "Invalid integer try again... (", &
                             the_nb_attempts-attempt, " attempt"

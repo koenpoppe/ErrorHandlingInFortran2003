@@ -49,7 +49,7 @@ module design_by_contract
 !         module procedure postcondition_full
 !     end interface postcondition_fails
     
-contains
+! contains
 
 !     function precondition_full( ifail, condition, message ) result( failed )
 !         type(error), intent(out), optional :: ifail

@@ -43,7 +43,11 @@ module username_selection
     
 #ifdef ERROR_HANDLING
     type, extends(message_error) :: username_error
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: username, proposed_alternative
+#else
+        character(len=MAX_CHARACTER_LEN) :: username = "", proposed_alternative = ""
+#endif
     contains
         procedure :: info_message => error_info_message_username_error
     end type username_error
@@ -72,8 +76,10 @@ contains
         
         ! Check preconditions on username
 #ifdef ERROR_HANDLING
-        if( precondition_fails( ifail, len_trim(username) > 0, &
-            "username must not be empty" ) ) return  ! TODO: shorter
+        call assert_gt( len_trim(username), 0, "username must not be empty", ifail, a_name="len_trim(username)" )
+        if( ifail /= 0 ) return
+!         if( precondition_fails( ifail, len_trim(username) > 0, &
+!             "username must not be empty" ) ) return  ! TODO: shorter
 #else
         if( len_trim(username) == 0 ) then
             call handle_error( 4000, ifail )

@@ -21,9 +21,17 @@
         type(error), intent(out), optional :: ifail<xsl:text/>
     </xsl:variable>
 	<xsl:variable name="ASSERT_OPTIONS_TYPEDECLARATION">
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable :: statement, comment, filename
+#else
+        character(MAX_CHARACTER_LEN) :: statement = "", comment = "", filename = ""
+#endif
         integer :: line = -1
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         <xsl:text/>character(:), allocatable :: a_name,b_name,extra_name
+#else
+        <xsl:text/>character(MAX_CHARACTER_LEN) :: a_name = "",b_name = "",extra_name = ""
+#endif
         logical :: show_difference_marks = .false.
     </xsl:variable>
 	<xsl:template name="assert-options-typeassignment">
@@ -105,7 +113,11 @@ module error_handling_unit_test
 <xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]">
     type, extends(unit_test_error) :: unit_test_error_rank<xsl:value-of select="."/>
         logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
+#else
+        character(len=MAX_CHARACTER_LEN)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
+#endif
     contains
         procedure :: info_message => unit_test_error_info_message_rank<xsl:value-of select="."/>
     end type unit_test_error_rank<xsl:value-of select="."/>
@@ -216,25 +228,38 @@ contains<xsl:text/>
             write(unit=unit,fmt="(A)",advance="no") "Run-time check"
         end if
         
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         if( allocated(info%filename) ) then
+#endif
             if( len_trim(info%filename) > 0 ) then
                 write(unit=unit,fmt="(2A)",advance="no") " in ", trim(info%filename)
             end if
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         end if
+#endif
         
         if( info%line > 0 ) then
             write(unit=unit,fmt="(A,I0)",advance="no") "@", info%line
         end if
         
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         if( allocated(info%statement) ) then
+#endif
             if( len_trim(info%statement) > 0 ) then
                 write(unit=unit,fmt="(2A)",advance="no") ": ", trim(info%statement)
             end if
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         end if
-        
+#endif
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         if( allocated(info%comment) ) then
-            write(unit=unit,fmt="(3A)",advance="no") " (", trim(info%comment), ")"
+#endif
+            if( len_trim(info%comment) > 0 ) then
+                write(unit=unit,fmt="(3A)",advance="no") " (", trim(info%comment), ")"
+            end if
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         end if
+#endif
             
         write(unit=unit,fmt="(A)") suffix
         
@@ -573,7 +598,7 @@ contains<xsl:text/>
         if( size(shape_a) /= size(shape_b) ) then
             call assert_eq( size(shape_a), size(shape_b), statement=statement, &amp; <!-- DEPENDS ON ASSERT_OPTIONS -->
                     a_name=a_name, b_name=b_name, filename=filename, line=line, &amp;
-                    comment=optional_character(comment) // "ranks differ", ifail=ifail, fmt=fmt )
+                    comment=optional_character(comment,"") // "ranks differ", ifail=ifail, fmt=fmt )
             return
         end if
         if( any(shape_a /= shape_b) ) then
@@ -610,14 +635,17 @@ contains<xsl:text/>
     end function optional_integer
     function optional_character( a, default ) result( name )
         character(len=*), intent(in), optional :: a, default
-        character(len=max(len(a),len(default))) :: name
-        
+        character(:), allocatable :: name
         name = optional_allocatable_character( a, default=default )
         
     end function optional_character
     function optional_allocatable_character( a, b, default ) result( name )
         character(len=*), intent(in), optional :: a, default
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
         character(:), allocatable, intent(in), optional :: b
+#else
+        character(len=*), intent(in), optional :: b
+#endif
         character(len=40) :: name
         
         name = ""
@@ -625,9 +653,15 @@ contains<xsl:text/>
             name = default
         end if
         if( present(b) ) then
+#ifndef FC_NO_ALLOCATABLE_CHARACTER
             if( allocated(b) ) then
                 name = b
             end if
+#else
+            if( len_trim(b) > 0 ) then
+                name = b
+            end if
+#endif
         end if
         if( present(a) ) then
             if( len_trim(a) > 0 ) then
@@ -742,7 +776,7 @@ end module error_handling_unit_test<xsl:text/>
             
             <xsl:call-template name="assert-options-typeassignment">
                 <xsl:with-param name="condition">a <xsl:value-of select="$condition_operator"/> b</xsl:with-param>
-                <xsl:with-param name="condition-str">info%a_name // " <xsl:value-of select="$condition_operator"/> " // info%b_name</xsl:with-param>
+                <xsl:with-param name="condition-str">trim(info%a_name) // " <xsl:value-of select="$condition_operator"/> " // trim(info%b_name)</xsl:with-param>
             </xsl:call-template>
             <xsl:if test="$condition_operator = '==' or $condition_operator = '/=' or $condition_operator = '.eqv.' or $condition_operator = '.neqv.'">
             
@@ -867,9 +901,9 @@ end module error_handling_unit_test<xsl:text/>
                 <xsl:with-param name="condition-str">
                     <xsl:choose>
                         <xsl:when test="$error_f = 'relerr'"><xsl:text/>&amp;
-                    "|(" // info%a_name // "-" // info%b_name // ")/" // info%a_name // "| &lt;= " // <xsl:value-of select="$err_tol"/>_str<xsl:text/></xsl:when>
+                    "|(" // trim(info%a_name) // "-" // trim(info%b_name) // ")/" // trim(info%a_name) // "| &lt;= " // <xsl:value-of select="$err_tol"/>_str<xsl:text/></xsl:when>
                         <xsl:when test="$error_f = 'abserr'"><xsl:text/>&amp;
-                    "|" // info%a_name // "-" // info%b_name // "| &lt;= " // <xsl:value-of select="$err_tol"/>_str<xsl:text/></xsl:when>
+                    "|" // trim(info%a_name) // "-" // trim(info%b_name) // "| &lt;= " // <xsl:value-of select="$err_tol"/>_str<xsl:text/></xsl:when>
                         <xsl:otherwise>[[Unknown error_f: '<xsl:value-of select="$error_f"/>']]</xsl:otherwise>
                     </xsl:choose>
                 </xsl:with-param>

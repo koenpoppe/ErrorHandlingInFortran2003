@@ -1,0 +1,28 @@
+Thu Dec 15 15:27:37 CET 2011
+
+=== username_selection_driver_new ====================================
+
+=== nversion_algorithm_driver_new ====================================
+
+=== fragile_input_driver_new ====================================
+
+=== lin_solve_driver_new ====================================
+1st call to solve
+Solution returned in x:
+   0.100E+01  0.500E+00  0.333E+00
+
+2nd call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is ill conditioned: 1/cond(diag)= 7.401E-18
+
+3th call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is exactly singular
+
+4th call to solve
+No solution returned in x because
+*** Error:
+       Argument trans='s' is invalid. The value must be one of the following: NnTtCc
+

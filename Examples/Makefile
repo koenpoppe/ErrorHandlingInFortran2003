@@ -4,17 +4,20 @@ first: one
 MAKEFLAGS+= --no-print-directory
 
 # Library
-LIBRARY_DIR=../Framework/Build_$(FC)/
+LIBRARY_DIR=../Framework/$(FC)_build/
 LIBRARY=-lerror_handling
 
 # Fortran compiler and flags
-FC=nagfor_beta
+FC=gfortran_beta
 FPP=$(FC)
 
 FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90 -u
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 
 FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
+
+FFLAGS_gfortran_beta=-std=f2008 -J $(LIBRARY_DIR) -cpp -O0 -g -DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_CHARACTER
+FFLAGS_gfortran=$(FFLAGS_gfortran_beta)
 
 FFLAGS=$(FFLAGS_$(FC))
 
@@ -106,10 +109,7 @@ veryclean: clean cleandrivers cleanpreprocs cleanlogs cleanothers
 # Collectives
 ALLTARGET=one
 all:
-	$(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=fragile_input
-	$(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=nversion_algorithm
-	$(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=username_selection
-	$(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=lin_solve
+	$(foreach EX,$(EXAMPLES), $(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=$(EX) ; )
 allversions_safe:
 	$(MAKE) clean all ALLTARGET=$(ALLTARGET) VERSION=old
 	$(MAKE) clean all ALLTARGET=$(ALLTARGET) VERSION=new
@@ -129,6 +129,11 @@ allclean:
 	$(MAKE) veryclean VERSION=old
 	$(MAKE) veryclean VERSION=new
 
+REGRESSION_FILENAME="regression/$(FC)_$(shell date +'%Y%m%d').txt"
+regression: veryclean all
+	@echo $(REGRESSION_FILENAME)
+	@date > $(REGRESSION_FILENAME)
+	@$(foreach EX,$(DRIVERS_PROG), echo "\n=== $(EX) ====================================" >> $(REGRESSION_FILENAME) ; ./$(EX) >> $(REGRESSION_FILENAME) ; )
 
 # Testing purpose
 flags:

@@ -10,6 +10,8 @@
     <type format="ES13.6">complex(kind=selected_real_kind(6,37))</type>
     <type format="ES22.15">real(kind=selected_real_kind(15,307))</type>
     <type format="ES22.15">complex(kind=selected_real_kind(15,307))</type>
-    <type format="ES38.31">real(kind=selected_real_kind(31,291))</type>
-    <type format="ES38.31">complex(kind=selected_real_kind(31,291))</type>
+    <type format="ES25.18">real(kind=selected_real_kind(18,4931))</type>
+    <type format="ES25.18">complex(kind=selected_real_kind(18,4931))</type>
+    <type format="ES40.33">real(kind=selected_real_kind(33,4931))</type>
+    <type format="ES40.33">complex(kind=selected_real_kind(33,4931))</type>
 </types>

@@ -32,7 +32,7 @@ contains
         class(allocation_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
-        if( size(info%requested_shape) == 1 ) then
+        if( size(info%requested_shape)  == 1 ) then
             write(unit=unit,fmt="(2A,I0,A,I0,2A)") prefix, &
                 "Allocating array with ", info%requested_shape, & 
                 " elements did not work (error code ", info%error_code, ").", suffix
