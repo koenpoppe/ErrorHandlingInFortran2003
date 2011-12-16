@@ -21,26 +21,57 @@ module error_handling_common_errors
     ! - allocation error (includes shape of requested allocation)
     type, extends(error_info), public :: allocation_error
         integer :: error_code
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         integer, dimension(:), allocatable :: requested_shape
+#else
+!         integer, private :: requested_rank
+!         integer, dimension(7) :: requested_shape
+#endif
     contains
         procedure :: info_message => allocation_error_info_message
     end type allocation_error
+#ifdef FC_NO_ALLOCATABLE_DTCOMP
+    interface allocation_error
+        module procedure allocation_error_constructor
+    end interface allocation_error
+    integer, dimension(:), private, allocatable :: allocation_error_requested_shape
+#endif
     
 contains
+    
+#ifdef FC_NO_ALLOCATABLE_DTCOMP
+    function allocation_error_constructor( error_code, requested_shape ) result( info )
+        integer, intent(in) :: error_code
+        integer, dimension(:), intent(in) :: requested_shape
+        type(allocation_error) :: info
+        
+        info%error_code = error_code
+        allocation_error_requested_shape = requested_shape
+        
+    end function allocation_error_constructor
+#endif
     
     subroutine allocation_error_info_message( info, unit, prefix, suffix )
         class(allocation_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
-        if( size(info%requested_shape)  == 1 ) then
-            write(unit=unit,fmt="(2A,I0,A,I0,2A)") prefix, &
-                "Allocating array with ", info%requested_shape, & 
-                " elements did not work (error code ", info%error_code, ").", suffix
-        else
-            write(unit=unit,fmt=*) prefix, "Allocating array of shape ", info%requested_shape, & 
-                " (=", product(info%requested_shape), & 
-                " elements) did not work (error code ", info%error_code, ").", suffix
-        end if
+        
+        ! TODO: remove workarround for allocatable derived type components
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
+        associate( requested_shape => info%requested_shape )
+#else
+        associate( requested_shape => allocation_error_requested_shape )
+#endif
+            if( size(requested_shape)  == 1 ) then
+                write(unit=unit,fmt="(2A,I0,A,I0,2A)") prefix, &
+                    "Allocating array with ", requested_shape, & 
+                    " elements did not work (error code ", info%error_code, ").", suffix
+            else
+                write(unit=unit,fmt=*) prefix, "Allocating array of shape ", requested_shape, & 
+                    " (=", product(requested_shape), & 
+                    " elements) did not work (error code ", info%error_code, ").", suffix
+            end if
+        end associate
     end subroutine allocation_error_info_message
     
     subroutine error_code_error_info_message( info, unit, prefix, suffix )

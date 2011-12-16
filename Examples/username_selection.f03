@@ -231,8 +231,8 @@ contains
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=unit,fmt="(9A)") prefix, "User name '", info%username, & 
-            "' is invalid because it ", info%message, &
+        write(unit=unit,fmt="(9A)") prefix, "User name '", trim(info%username), & 
+            "' is invalid because it ", trim(info%message), &
             ". Proposed alternative: '", trim(info%proposed_alternative) ,"'.", suffix
         
     end subroutine error_info_message_username_error

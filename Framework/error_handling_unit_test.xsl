@@ -37,6 +37,7 @@
 	<xsl:template name="assert-options-typeassignment">
 		<xsl:param name="condition"/>
 		<xsl:param name="condition-str"/>
+		<xsl:param name="rank" select="@rank"/>
             
             ! Populate common info
             info%filename = optional_character( filename, "" )
@@ -44,9 +45,23 @@
             info%line = optional_integer( line, -1 )
             
             ! Populate error_info type specific for this rank
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
             info%diff = .not. ( <xsl:value-of select="$condition"/> )
             info%a = a_str
             info%b = b_str
+#else
+            unit_test_error_rank<xsl:value-of select="$rank"/>_diff = .not. ( <xsl:value-of select="$condition"/> )
+            unit_test_error_rank<xsl:value-of select="$rank"/>_a = a_str
+            unit_test_error_rank<xsl:value-of select="$rank"/>_b = b_str
+            <xsl:if test="$rank = 0 ">
+            unit_test_error_rank<xsl:value-of select="$rank"/>_extra = "m"
+            </xsl:if>
+            <xsl:if test="$rank &gt; 0 ">
+            if( allocated(unit_test_error_rank<xsl:value-of select="$rank"/>_extra) ) &amp;
+                deallocate(unit_test_error_rank<xsl:value-of select="$rank"/>_extra)
+            </xsl:if>
+#endif
+            
             info%a_name = optional_character( a_name, "a" )
             info%b_name = optional_character( b_name, "b" )
             info%statement = optional_character( statement, <xsl:value-of select="$condition-str"/> )
@@ -112,15 +127,18 @@ module error_handling_unit_test
     end type unit_test_error
 <xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]">
     type, extends(unit_test_error) :: unit_test_error_rank<xsl:value-of select="."/>
-        logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
 #ifndef FC_NO_ALLOCATABLE_DTCOMP
+        logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
         character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
-#else
-        character(len=MAX_CHARACTER_LEN)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
 #endif
     contains
         procedure :: info_message => unit_test_error_info_message_rank<xsl:value-of select="."/>
     end type unit_test_error_rank<xsl:value-of select="."/>
+#ifdef FC_NO_ALLOCATABLE_DTCOMP
+    logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: unit_test_error_rank<xsl:value-of select="."/>_diff
+    character(len=MAX_CHARACTER_LEN)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: unit_test_error_rank<xsl:value-of select="."/>_a, &amp;
+        unit_test_error_rank<xsl:value-of select="."/>_b, unit_test_error_rank<xsl:value-of select="."/>_extra
+#endif
 </xsl:for-each>
 
     !--------------------------------------------------------------------------
@@ -334,7 +352,7 @@ contains<xsl:text/>
         name_width = max(1,len_trim(la_name),len_trim(lb_name),len_trim(lextra_name))
         
         ! Some statistics
-        element_width = len(a(1))
+        element_width = len_trim(a(1))
         nb = size(diff)
         nb_diff = count(diff)
         
@@ -544,13 +562,28 @@ contains<xsl:text/>
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
         
-        if( allocated(info%extra) ) then
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
+        associate( diff=>info%diff, extra=>info%extra )
+            if( allocated(extra) ) then
+                call report_details_rank1( info, unit, prefix, suffix, &amp;
+                        (/ diff /), (/ info%a /), (/ info%b /), (/ info%extra /) )
+            else
+                call report_details_rank1( info, unit, prefix, suffix, &amp;
+                        (/ diff /), (/ info%a /), (/ info%b /) )
+            end if
+        end associate
+#else
+        associate( diff=>unit_test_error_rank0_diff, &amp;
+                    a=>unit_test_error_rank0_a, b=>unit_test_error_rank0_b )
+            if( len_trim(unit_test_error_rank0_extra) &gt; 0 ) then
+                call report_details_rank1( info, unit, prefix, suffix, &amp;
+                        (/ diff /), (/ a /), (/ b /), (/ unit_test_error_rank0_extra /) )
+                return
+            end if
             call report_details_rank1( info, unit, prefix, suffix, &amp;
-                    (/ info%diff /), (/ info%a /), (/ info%b /), (/ info%extra /) )
-        else
-            call report_details_rank1( info, unit, prefix, suffix, &amp;
-                    (/ info%diff /), (/ info%a /), (/ info%b /) )
-        end if
+                    (/ diff /), (/ a /), (/ b /) )
+        end associate
+#endif
         
     end subroutine unit_test_error_info_message_rank0
     
@@ -558,29 +591,62 @@ contains<xsl:text/>
         class(unit_test_error_rank1), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
-        
-        if( allocated(info%extra) ) then
+
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
+        associate( diff=>info%diff )
+            if( allocated(info%extra) ) then
+                call report_details_rank1( info, unit, prefix, suffix, &amp;
+                    diff, info%a, info%b, info%extra )
+            else
+                call report_details_rank1( info, unit, prefix, suffix, &amp;
+                    diff, info%a, info%b )
+            end if
+        end associate
+#else
+        associate( diff=>unit_test_error_rank1_diff, &amp;
+                    a=>unit_test_error_rank1_a, b=>unit_test_error_rank1_b )
+            if( allocated(unit_test_error_rank1_extra) ) then
+                if( any(len_trim(unit_test_error_rank1_extra) > 0) ) then
+                    call report_details_rank1( info, unit, prefix, suffix, &amp;
+                        diff, a, b, unit_test_error_rank1_extra )
+                    return
+                end if
+            end if
             call report_details_rank1( info, unit, prefix, suffix, &amp;
-                    info%diff, info%a, info%b, info%extra )
-        else
-            call report_details_rank1( info, unit, prefix, suffix, &amp;
-                    info%diff, info%a, info%b )
-        end if
-        
+                    diff, a, b )
+        end associate
+#endif
     end subroutine unit_test_error_info_message_rank1
     
     subroutine unit_test_error_info_message_rank2( info, unit, prefix, suffix )
         class(unit_test_error_rank2), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
-        
-        if( allocated(info%extra) ) then
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
+        associate( diff=>info%diff )
+            if( allocated(info%extra) ) then
+                call report_details_rank2( info, unit, prefix, suffix, &amp;
+                        diff, info%a, info%b, info%extra )
+            else
+                call report_details_rank2( info, unit, prefix, suffix, &amp;
+                        diff, info%a, info%b )
+            end if
+        end associate
+#else
+        associate( diff=>unit_test_error_rank2_diff, &amp;
+                    a=>unit_test_error_rank2_a, b=>unit_test_error_rank2_b )
+            if( allocated(unit_test_error_rank2_extra) ) then
+                if( any(len_trim(unit_test_error_rank2_extra) > 0) ) then
+                    call report_details_rank2( info, unit, prefix, suffix, &amp;
+                            diff, a, b, unit_test_error_rank2_extra )
+                    return
+                end if
+            end if
             call report_details_rank2( info, unit, prefix, suffix, &amp;
-                    info%diff, info%a, info%b, info%extra )
-        else
-            call report_details_rank2( info, unit, prefix, suffix, &amp;
-                    info%diff, info%a, info%b )
-        end if
+                    diff, a, b )
+        end associate
+#endif       
+            
         
     end subroutine unit_test_error_info_message_rank2<xsl:text/>
 <xsl:call-template name="procedures"/>
@@ -911,7 +977,11 @@ end module error_handling_unit_test<xsl:text/>
             
             ! Populate additional information
             info%show_difference_marks = .true.
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
             info%extra = e_str
+#else
+            unit_test_error_rank<xsl:value-of select="$rank"/>_extra = e_str
+#endif
             info%extra_name = "<xsl:value-of select="$error_f"/>"
             
             ! Create the error and report failed
