@@ -42,7 +42,6 @@ contains
                 " elements) did not work (error code ", info%error_code, ").", suffix
         end if
     end subroutine allocation_error_info_message
-    ! TODO: allocate wrapper for all types ...
     
     subroutine error_code_error_info_message( info, unit, prefix, suffix )
         class(error_code_error), intent(in) :: info

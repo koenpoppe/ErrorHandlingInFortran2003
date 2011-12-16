@@ -42,7 +42,7 @@ module lin_solve
     
 #ifdef ERROR_HANDLING
     type, extends(error_info) :: argument_error
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: name, actual_value
         character(:), allocatable :: allowed_values
 #else
@@ -54,7 +54,7 @@ module lin_solve
     end type argument_error
     
     type, extends(error_info) :: illconditioned_error
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: name
 #else
         character(len=MAX_CHARACTER_LEN) :: name = ""

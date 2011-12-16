@@ -138,7 +138,6 @@ contains
         
     end subroutine my_nversion_algorithm
 
-
     ! Error enhanced workspace allocation
     subroutine allocate_workspace( workspace_size, ifail )
         

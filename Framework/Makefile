@@ -19,7 +19,7 @@ FFLAGS_nagfor=$(FFLAGS_nagfor_beta)
 FFLAGS_gfortran_beta=-std=f2008 
 FFLAGS_gfortran_beta+=-J $(LIBDIR) -cpp
 FFLAGS_gfortran_beta+=-O0 -g
-FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_CHARACTER
+FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP
 
 # (old) gfortran = GNU Fortran (Ubuntu 4.4.3-4ubuntu5) 4.4.3
 #    - very limited support for f2003

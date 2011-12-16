@@ -16,7 +16,7 @@ FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 
 FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
 
-FFLAGS_gfortran_beta=-std=f2008 -J $(LIBRARY_DIR) -cpp -O0 -g -DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_CHARACTER
+FFLAGS_gfortran_beta=-std=f2008 -J $(LIBRARY_DIR) -cpp -O0 -g -DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP
 FFLAGS_gfortran=$(FFLAGS_gfortran_beta)
 
 FFLAGS=$(FFLAGS_$(FC))

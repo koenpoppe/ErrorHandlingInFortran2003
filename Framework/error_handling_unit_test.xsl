@@ -21,13 +21,13 @@
         type(error), intent(out), optional :: ifail<xsl:text/>
     </xsl:variable>
 	<xsl:variable name="ASSERT_OPTIONS_TYPEDECLARATION">
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: statement, comment, filename
 #else
         character(MAX_CHARACTER_LEN) :: statement = "", comment = "", filename = ""
 #endif
         integer :: line = -1
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         <xsl:text/>character(:), allocatable :: a_name,b_name,extra_name
 #else
         <xsl:text/>character(MAX_CHARACTER_LEN) :: a_name = "",b_name = "",extra_name = ""
@@ -113,7 +113,7 @@ module error_handling_unit_test
 <xsl:for-each select="exsl:node-set($ranks)/*[ . &lt; 3]">
     type, extends(unit_test_error) :: unit_test_error_rank<xsl:value-of select="."/>
         logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
 #else
         character(len=MAX_CHARACTER_LEN)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
@@ -228,13 +228,13 @@ contains<xsl:text/>
             write(unit=unit,fmt="(A)",advance="no") "Run-time check"
         end if
         
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(info%filename) ) then
 #endif
             if( len_trim(info%filename) > 0 ) then
                 write(unit=unit,fmt="(2A)",advance="no") " in ", trim(info%filename)
             end if
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         end if
 #endif
         
@@ -242,22 +242,22 @@ contains<xsl:text/>
             write(unit=unit,fmt="(A,I0)",advance="no") "@", info%line
         end if
         
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(info%statement) ) then
 #endif
             if( len_trim(info%statement) > 0 ) then
                 write(unit=unit,fmt="(2A)",advance="no") ": ", trim(info%statement)
             end if
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         end if
 #endif
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(info%comment) ) then
 #endif
             if( len_trim(info%comment) > 0 ) then
                 write(unit=unit,fmt="(3A)",advance="no") " (", trim(info%comment), ")"
             end if
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         end if
 #endif
             
@@ -641,7 +641,7 @@ contains<xsl:text/>
     end function optional_character
     function optional_allocatable_character( a, b, default ) result( name )
         character(len=*), intent(in), optional :: a, default
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable, intent(in), optional :: b
 #else
         character(len=*), intent(in), optional :: b
@@ -653,7 +653,7 @@ contains<xsl:text/>
             name = default
         end if
         if( present(b) ) then
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
             if( allocated(b) ) then
                 name = b
             end if

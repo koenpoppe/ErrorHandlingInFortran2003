@@ -42,7 +42,7 @@ module fragile_input
 #ifdef ERROR_HANDLING
     type, extends(error_info) :: fragile_input_error
         integer :: nb_attempts
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: input_type
 #else
         character(MAX_CHARACTER_LEN) :: input_type = ""

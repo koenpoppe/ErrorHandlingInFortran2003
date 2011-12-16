@@ -42,12 +42,12 @@ module error_handling_error
     end type error_info
 
     ! 2. Errors itself
-#ifdef FC_NO_ALLOCATABLE_CHARACTER
+#ifdef FC_NO_ALLOCATABLE_DTCOMP
     integer, parameter, public :: MAX_CHARACTER_LEN=1024
 #endif
     type, public :: error
         class(error_info), pointer :: info => NULL()
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: method
 #else
         character(len=MAX_CHARACTER_LEN) :: method = ""
@@ -70,7 +70,7 @@ module error_handling_error
     
     ! 4. Message error information type
     type, extends(error_info), public :: message_error
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: message
 #else
         character(len=MAX_CHARACTER_LEN) :: message = ""
@@ -156,7 +156,7 @@ contains
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
 
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(info%message) ) then ! TODO precondition
 #else
         if( len_trim(info%message) > 0 ) then
@@ -350,7 +350,7 @@ contains
             write(unit=REPORT_UNIT,fmt="(A)",advance="no") " ** cascading"
         end if
 
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(exc%method) ) &
             write(unit=REPORT_UNIT,fmt="(3A)",advance="no") " from '", exc%method, "'"
 #else

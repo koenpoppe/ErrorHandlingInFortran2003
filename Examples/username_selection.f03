@@ -43,7 +43,7 @@ module username_selection
     
 #ifdef ERROR_HANDLING
     type, extends(message_error) :: username_error
-#ifndef FC_NO_ALLOCATABLE_CHARACTER
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         character(:), allocatable :: username, proposed_alternative
 #else
         character(len=MAX_CHARACTER_LEN) :: username = "", proposed_alternative = ""
