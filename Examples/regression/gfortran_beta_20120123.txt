@@ -1,0 +1,100 @@
+Mon Jan 23 12:20:09 CET 2012
+
+=== username_selection_driver_new ====================================
+=> register_username( '' )
+*** Error:
+       Run-time check: len_trim(username) > b (username must not be empty)
+       len_trim(username) =          0
+                        b =          0
+
+=> register_username( 'Koen' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen' is invalid because it must contain one or more digits. Proposed alternative: 'Koen1'.
+
+=> register_username( 'Koen 123' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen 123' is invalid because it must not contain spaces. Proposed alternative: 'Koen123'.
+
+=> register_username( 'Koen.123' )
+OK.
+
+-- Altering the future: the username will be existing --
+=> register_username( 'Koen.123' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen.123' is invalid because it is already used. Proposed alternative: 'Koen.123_1'.
+
+-- Altering the future: the connection to the server will fail --
+=> register_username( 'Koen.123' )
+*** Error from 'username_selection:register_username':
+       Could not verify the username
+ ** cascading:
+       Connection to server could not be established
+
+
+
+=== nversion_algorithm_driver_new ====================================
+
+=> my_nversion_algorithm(       100 )
+Performing my_nversion_algorithm version 1.
+
+=> my_nversion_algorithm(      1000 )
+Performing my_nversion_algorithm version 2.
+
+=> my_nversion_algorithm(   1000000 )
+Performing my_nversion_algorithm version 3.
+
+=> my_nversion_algorithm(   1000001 )
+*** Error from 'nversion_algorithm:my_nversion_algorithm':
+       Failed to perform any of the versions of the algorithm
+ ** cascading from 'nversion_algorithm:my_nversion_algorithm':
+       Version 3 is only valid for even values of N
+
+=> my_nversion_algorithm(   1000002 )
+*** Error from 'nversion_algorithm:my_nversion_algorithm':
+       Failed to perform any of the versions of the algorithm
+ ** cascading from 'nversion_algorithm:allocate_workspace:enforced':
+       Allocating array with 1000002 elements did not work (error code 1000000).
+
+=== fragile_input_driver_new ====================================
+Invalid integer try again... (4 attempts left)
+ => Number =          111
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Error from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 5010.
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Error from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 5001.
+
+
+=== lin_solve_driver_new ====================================
+1st call to solve
+Solution returned in x:
+   0.100E+01  0.500E+00  0.333E+00
+
+2nd call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is ill conditioned: 1/cond(diag)= 7.401E-18
+
+3th call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is exactly singular
+
+4th call to solve
+No solution returned in x because
+*** Error:
+       Argument trans='s' is invalid. The value must be one of the following: NnTtCc
+

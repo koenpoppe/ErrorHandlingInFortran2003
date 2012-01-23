@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<dbc>
+	<type>precondition</type>
+	<type>postcondition</type>
+	<type>check</type>
+</dbc>
