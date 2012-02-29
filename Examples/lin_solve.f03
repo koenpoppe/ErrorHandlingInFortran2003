@@ -50,7 +50,7 @@ module lin_solve
         character(len=MAX_CHARACTER_LEN) :: allowed_values = ""
 #endif
     contains
-        procedure :: info_message => error_info_message_argument_error
+        procedure :: write_to => argument_error_write_to
     end type argument_error
     
     type, extends(error_info) :: illconditioned_error
@@ -62,7 +62,7 @@ module lin_solve
         
         real(kind=wp) :: lambda_min, lambda_max
     contains
-        procedure :: info_message => error_info_message_illconditioned_error
+        procedure :: write_to => illconditioned_error_write_to
     end type illconditioned_error
 #endif
 
@@ -122,7 +122,7 @@ contains
     end function solve
     
 #ifdef ERROR_HANDLING
-    subroutine error_info_message_argument_error( info, unit, prefix, suffix )
+    subroutine argument_error_write_to( info, unit, prefix, suffix )
         class(argument_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -131,9 +131,9 @@ contains
             "Argument ", trim(info%name), "='", trim(info%actual_value), "' is invalid. ", & 
             "The value must be one of the following: ", trim(info%allowed_values), suffix
         
-    end subroutine error_info_message_argument_error
+    end subroutine argument_error_write_to
     
-    subroutine error_info_message_illconditioned_error( info, unit, prefix, suffix )
+    subroutine illconditioned_error_write_to( info, unit, prefix, suffix )
         class(illconditioned_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -147,7 +147,7 @@ contains
                 "1/cond(", trim(info%name), ")=", info%lambda_min/info%lambda_max, suffix
         end if
         
-    end subroutine error_info_message_illconditioned_error
+    end subroutine illconditioned_error_write_to
 #else
     subroutine print_error( inform )
         integer, intent(in) :: inform

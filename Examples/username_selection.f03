@@ -49,7 +49,7 @@ module username_selection
         character(len=MAX_CHARACTER_LEN) :: username = "", proposed_alternative = ""
 #endif
     contains
-        procedure :: info_message => error_info_message_username_error
+        procedure :: write_to => username_error_write_to
     end type username_error
 #endif
 
@@ -226,7 +226,7 @@ contains
     end subroutine change_future
 
 #ifdef ERROR_HANDLING
-    subroutine error_info_message_username_error( info, unit, prefix, suffix )
+    subroutine username_error_write_to( info, unit, prefix, suffix )
         class(username_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -235,7 +235,7 @@ contains
             "' is invalid because it ", trim(info%message), &
             ". Proposed alternative: '", trim(info%proposed_alternative) ,"'.", suffix
         
-    end subroutine error_info_message_username_error
+    end subroutine username_error_write_to
 #else
     subroutine print_error( ifail )
         integer, intent(in) :: ifail

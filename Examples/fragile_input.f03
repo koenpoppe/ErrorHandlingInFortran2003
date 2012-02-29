@@ -48,7 +48,7 @@ module fragile_input
         character(MAX_CHARACTER_LEN) :: input_type = ""
 #endif
     contains
-        procedure, pass :: info_message => error_info_message_fragile_input_error
+        procedure, pass :: write_to => fragile_input_error_write_to
     end type fragile_input_error
 #endif
     
@@ -193,7 +193,7 @@ contains
     end subroutine integer_input
 
 #ifdef ERROR_HANDLING
-    subroutine error_info_message_fragile_input_error( info, unit, prefix, suffix )
+    subroutine fragile_input_error_write_to( info, unit, prefix, suffix )
         class(fragile_input_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -202,7 +202,7 @@ contains
             "Failed reading a valid ", info%input_type, " within ", & 
             info%nb_attempts, " attempts", suffix
     
-    end subroutine error_info_message_fragile_input_error
+    end subroutine fragile_input_error_write_to
 #else
     subroutine print_error( ifail )
         integer, intent(in) :: ifail

@@ -14,7 +14,7 @@
 !                      ifail%info=>info
 !                 Because info is intent(in), it gets deleted at the end of the method, 
 !                 and that results in a dangling pointer ...
-!   20111108 KP - Changed the info_message prototype (TODO: should be renamed...)
+!   20111108 KP - Changed the write_to prototype
 ! 
 ! AUTHOR
 ! 
@@ -38,7 +38,7 @@ module error_handling_error
     ! 1. Abstract information type
     type, public :: error_info ! TODO: abstract
     contains
-        procedure, pass, public :: info_message => error_info_info_message
+        procedure, pass, public :: write_to => error_info_write_to
     end type error_info
 
     ! 2. Errors itself
@@ -65,7 +65,7 @@ module error_handling_error
     ! 3. Sentinel no-error information type
     type, extends(error_info), public :: no_error
     contains
-        procedure, pass :: info_message => no_error_info_message
+        procedure, pass :: write_to => no_error_write_to
     end type no_error
     
     ! 4. Message error information type
@@ -76,7 +76,7 @@ module error_handling_error
         character(len=MAX_CHARACTER_LEN) :: message = ""
 #endif
     contains
-        procedure :: info_message => message_error_info_message
+        procedure :: write_to => message_error_write_to
     end type message_error
     
     !--------------------------------------------------------------------------
@@ -135,7 +135,7 @@ contains
 #endif
     
     ! 2. Abstract information type
-    subroutine error_info_info_message( info, unit, prefix, suffix )
+    subroutine error_info_write_to( info, unit, prefix, suffix )
         class(error_info), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -146,12 +146,12 @@ contains
                     "No specific information available ...", suffix
             class default
                 write(unit=unit,fmt="(3A)") prefix, &
-                    "(override the 'info_message' type bound procedure to provide a meaningful messages)", suffix
+                    "(override the 'write_to' type bound procedure to provide a meaningful messages)", suffix
         end select
         
-    end subroutine error_info_info_message
+    end subroutine error_info_write_to
     
-    subroutine message_error_info_message( info, unit, prefix, suffix )
+    subroutine message_error_write_to( info, unit, prefix, suffix )
         class(message_error), intent(in) ::  info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -168,10 +168,10 @@ contains
                 "INTERNAL BUG? info%message not allocated"
         end if
 
-    end subroutine message_error_info_message
+    end subroutine message_error_write_to
     
     ! 3. Sentinel no-error information type
-    subroutine no_error_info_message( info, unit, prefix, suffix )
+    subroutine no_error_write_to( info, unit, prefix, suffix )
         class(no_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -185,7 +185,7 @@ contains
                     "EXTERNAL ERROR: you should not extend the no_error derived type.", suffix
         end select
         
-    end subroutine no_error_info_message
+    end subroutine no_error_write_to
     
     !--------------------------------------------------------------------------
     ! Operations for errors
@@ -362,8 +362,8 @@ contains
         write(unit=REPORT_UNIT,fmt="(A)") ":"
         
         if( associated(exc%info) ) then
-!             call exc%info%info_message( REPORT_UNIT, "<line>", "</line>" ) ! TODO: xml output
-            call exc%info%info_message( REPORT_UNIT, "       ", "" )
+!             call exc%info%write_to( REPORT_UNIT, "<line>", "</line>" ) ! TODO: xml output
+            call exc%info%write_to( REPORT_UNIT, "       ", "" )
         end if
         
         if( associated( exc%reason ) ) then ! TODO: necessary?

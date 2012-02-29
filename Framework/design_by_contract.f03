@@ -72,8 +72,8 @@ contains
     ! Change specific checks
     !    call dbc_setup( precondition=.true. )
     !    call dbc_setup( precondition=.false. )
-    subroutine dbc_setup( precondition, postcondition, check, all )
-        logical, intent(in) :: precondition, postcondition, check, all
+    subroutine dbc_setup( all, precondition, postcondition, check )
+        logical, intent(in) :: all, precondition, postcondition, check
         
         check_precondition  = optional_logical( precondition,  optional_logical( all, check_precondition  ) )
         check_postcondition = optional_logical( postcondition, optional_logical( all, check_postcondition ) )

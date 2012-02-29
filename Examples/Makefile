@@ -147,10 +147,8 @@ unittest_test: unittest_test.o unittest_test_driver.o
 	$(FC) -o $@ $^ $(LDFLAGS)
 
 
-dbc_test_pp.f03: dbc_test.f03 ../Framework/error_handling_preprocessing.h
-	cpp dbc_test.f03 > $@
-dbc_test: dbc_test_pp.f03
-	$(FC) -o $@ $^ $(LDFLAGS) $(FFLAGS)
+dbc_test: dbc_test.o
+	$(FC) -o $@ $^ $(LDFLAGS)
 
 test: dbc_test
 	./dbc_test

@@ -9,13 +9,13 @@ module error_handling_common_errors
     type, extends(error_info), public :: error_code_error
         integer :: error_code
     contains
-        procedure :: info_message => error_code_error_info_message
+        procedure :: write_to => error_code_error_write_to
     end type error_code_error
     
     ! IOSTAT
     type, extends(error_code_error), public :: iostat_error
     contains
-        procedure :: info_message => iostat_error_info_message
+        procedure :: write_to => iostat_error_write_to
     end type iostat_error
     
     ! - allocation error (includes shape of requested allocation)
@@ -25,7 +25,7 @@ module error_handling_common_errors
         integer, dimension(:), allocatable :: requested_shape
 #endif
     contains
-        procedure :: info_message => allocation_error_info_message
+        procedure :: write_to => allocation_error_write_to
     end type allocation_error
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
 #ifdef FC_NO_DT_CONSTRUCTOR
@@ -52,7 +52,7 @@ contains
     end function allocation_error_constructor
 #endif
     
-    subroutine allocation_error_info_message( info, unit, prefix, suffix )
+    subroutine allocation_error_write_to( info, unit, prefix, suffix )
         class(allocation_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -73,9 +73,9 @@ contains
                     " elements) did not work (error code ", info%error_code, ").", suffix
             end if
         end associate
-    end subroutine allocation_error_info_message
+    end subroutine allocation_error_write_to
     
-    subroutine error_code_error_info_message( info, unit, prefix, suffix )
+    subroutine error_code_error_write_to( info, unit, prefix, suffix )
         class(error_code_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -83,9 +83,9 @@ contains
         write(unit=unit,fmt="(2A,I0,2A)") prefix, & 
             "Encountered error code ", info%error_code, ".", suffix
         
-    end subroutine error_code_error_info_message
+    end subroutine error_code_error_write_to
     
-    subroutine iostat_error_info_message( info, unit, prefix, suffix )
+    subroutine iostat_error_write_to( info, unit, prefix, suffix )
         use ISO_FORTRAN_ENV, only: IOSTAT_END, IOSTAT_EOR
         
         class(iostat_error), intent(in) :: info
@@ -104,6 +104,6 @@ contains
                     "Processor dependent code ", info%error_code, ".", suffix
         end select
         
-    end subroutine iostat_error_info_message
+    end subroutine iostat_error_write_to
 
 end module error_handling_common_errors

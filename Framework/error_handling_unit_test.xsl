@@ -84,7 +84,7 @@
 !   20110412 KP - Ported to auto-generated system
 !   20111107 KP - Improve reporting
 !                 NOTE@self: the distinction between runtime check and unit test test is nice.
-!   20111108 KP - Changing the info_message prototype proved to be a good move for the report functions
+!   20111108 KP - Changing the write_to prototype proved to be a good move for the report functions
 !   20111109 KP - Code cleanup and improved documentation
 !               - Changed assert_equal to assert_eq to conform to the common literal names for the comparisons
 !               - Added assert_XX where XX in { NE, LT, LE, GT, GE }
@@ -134,7 +134,7 @@ module error_handling_unit_test
         character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
 #endif
     contains
-        procedure :: info_message => unit_test_error_info_message_rank<xsl:value-of select="."/>
+        procedure :: write_to => unit_test_error_write_to_rank<xsl:value-of select="."/>
     end type unit_test_error_rank<xsl:value-of select="."/>
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
     logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: unit_test_error_rank<xsl:value-of select="."/>_diff
@@ -595,7 +595,7 @@ contains<xsl:text/>
     !--------------------------------------------------------------------------
     ! TODO: better way of handling the optionally allocated info%extra?
     
-    subroutine unit_test_error_info_message_rank0( info, unit, prefix, suffix )
+    subroutine unit_test_error_write_to_rank0( info, unit, prefix, suffix )
         class(unit_test_error_rank0), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -623,9 +623,9 @@ contains<xsl:text/>
         end associate
 #endif
         
-    end subroutine unit_test_error_info_message_rank0
+    end subroutine unit_test_error_write_to_rank0
     
-    subroutine unit_test_error_info_message_rank1( info, unit, prefix, suffix )
+    subroutine unit_test_error_write_to_rank1( info, unit, prefix, suffix )
         class(unit_test_error_rank1), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -654,9 +654,9 @@ contains<xsl:text/>
                     diff, a, b )
         end associate
 #endif
-    end subroutine unit_test_error_info_message_rank1
+    end subroutine unit_test_error_write_to_rank1
     
-    subroutine unit_test_error_info_message_rank2( info, unit, prefix, suffix )
+    subroutine unit_test_error_write_to_rank2( info, unit, prefix, suffix )
         class(unit_test_error_rank2), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
@@ -686,7 +686,7 @@ contains<xsl:text/>
 #endif       
             
         
-    end subroutine unit_test_error_info_message_rank2<xsl:text/>
+    end subroutine unit_test_error_write_to_rank2<xsl:text/>
 <xsl:call-template name="procedures"/>
 
     !--------------------------------------------------------------------------
@@ -954,8 +954,8 @@ end module error_handling_unit_test<xsl:text/>
         <xsl:param name="version"/>
         <xsl:call-template name="assert_err">
             <xsl:with-param name="version" select="$version"/>
-            <xsl:with-param name="error_f">abserr</xsl:with-param>
-            <xsl:with-param name="err_tol">epsabs</xsl:with-param>
+            <xsl:with-param name="error_f">relerr</xsl:with-param>
+            <xsl:with-param name="err_tol">epsrel</xsl:with-param>
         </xsl:call-template>
     </xsl:template>
     
