@@ -22,10 +22,10 @@ program unittest_test_driver
     open(unit=unit,file="unittest_test_driver.txt",action="write",status="unknown")
 !     call set_report_error_unit( unit )
     
-    call unit_test_reset( "unittest_test" )
+    call unit_test_reset( "unittest_test_driver" )
     
-    call primitive()
-    call scalar()
+!     call primitive()
+!     call scalar()
     
     call short_vector()
     call large_vector()

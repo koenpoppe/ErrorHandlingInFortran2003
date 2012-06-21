@@ -8,7 +8,7 @@ LIBRARY_DIR=../Framework/$(FC)_build/
 LIBRARY=-lerror_handling
 
 # Fortran compiler and flags
-FC=gfortran_beta
+FC=nagfor_beta
 FPP=$(FC)
 
 FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90 -u
@@ -30,8 +30,8 @@ clean:
 	$(RM) *.o *.mod *.g90
 
 # The available examples and the selected one
-EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve
-EXAMPLE=username_selection
+EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test
+EXAMPLE=unittest_test
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))

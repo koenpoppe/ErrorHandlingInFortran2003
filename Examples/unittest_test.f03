@@ -5,6 +5,7 @@
 ! HISTORY
 ! 
 !   20110412 KP - Converted from old code and general clean up
+!   20120611 KP - Updated using unittest_ primitives
 ! 
 ! AUTHOR
 ! 
@@ -18,197 +19,143 @@ module unittest_test
     implicit none
     
 contains
-    
-    subroutine my_report_error( inform, comment )
-        type(error), intent(in out) :: inform
-        character(len=*), intent(in) :: comment
-        
-        if( inform /= 0 ) then
-            select type( info => inform%info )
-                class is( unit_test_error )
-                    info%comment = comment
-            end select
-            call report_error( inform )
-        end if
-        call write_unit_test_report()
-        
-    end subroutine my_report_error
 
     subroutine primitive()
-        type(error) :: inform
         
-        call assert( .true., ifail=inform )
-        call my_report_error( inform, "primitive, true" )
-        call assert( .false., ifail=inform )
-        call my_report_error( inform, "primitive, true" )
+        call unittest( .true., comment="primitive, succeeds" )
+        call unittest( .false., comment="primitive, must fail" )
         
     end subroutine primitive
 
     subroutine scalar()
-        type(error) :: inform
 
-        call assert_eq( .true., .true., ifail=inform )
-        call my_report_error( inform, "logical, equal" )
-        call assert_eq( .true., .false., ifail=inform )
-        call my_report_error( inform, "logical, different" )
+        call unittest_eq( .true., .true., comment="logical, equal" )
+        call unittest_eq( .true., .false., comment="logical, different, must fail" )
 
-        call assert_eq( 1, 1, ifail=inform )
-        call my_report_error( inform, "integer, equal" )
-        call assert_eq( 1, 2, ifail=inform )
-        call my_report_error( inform, "integer, different" )
+        call unittest_eq( 1, 1, comment="integer, equal" )
+        call unittest_eq( 1, 2, comment="integer, different, must fail" )
 
-        call assert_eq( "a", "b", ifail=inform )
-        call my_report_error( inform, "character(len=1)" )
+        call unittest_eq( "a", "b", comment="character(len=1), must fail" )
 
-        call assert_eq( "abcbcan", "bbcbacn", ifail=inform )
-        call my_report_error( inform, "character(len>1)" )
+        call unittest_eq( "abcbcan", "bbcbacn", comment="character(len>1), must fail" )
 
     end subroutine scalar
 
     subroutine short_vector()
-        type(error) :: inform
         
-        call assert_eq( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
-        call my_report_error( inform, comment="short_vector, equal" )
+        call unittest_eq( (/ 1,2,3 /), (/ 1,2,3 /), comment="short_vector, equal" )
         
         ! Special
-        call assert_eq( (/ 1,2,3 /), (/ 1,2,3,5 /), ifail=inform )
-        call my_report_error( inform, comment="short_vector, different length" )
+        call unittest_eq( (/ 1,2,3 /), (/ 1,2,3,5 /), comment="short_vector, different length, must fail" )
 
         ! small array: show all
-        call assert_eq( (/ 1,2,3 /), (/ 1,2,3 /), ifail=inform )
-        call my_report_error( inform, comment="short_vector, equal" )
+        call unittest_eq( (/ 1,2,3 /), (/ 1,2,3 /), comment="short_vector, equal" )
         
-        call assert_eq( (/ 1,2,3 /), (/ 3,2,1 /), ifail=inform )
-        call my_report_error( inform, comment="short_vector, show all" )
+        call unittest_eq( (/ 1,2,3 /), (/ 3,2,1 /), comment="short_vector, show all, must fail" )
 
     end subroutine short_vector
 
     subroutine large_vector()
         integer, dimension(:),   allocatable :: A,B
-        type(error) :: inform
         
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, compress middle" )
+        call unittest_eq( A,B, comment="large_vector, compress middle, must fail" )
         
         ! large number: compress equal parts and show indexes
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 3,1,9,9,9,9,9,9,9,9,9,9,2 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, compress middle" )
+        call unittest_eq( A,B, comment="large_vector, compress middle, must fail" )
         
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 3,2,8,9,7,9,9,9,3,9,9,9,2 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, compress middle" )
+        call unittest_eq( A,B, comment="large_vector, compress middle, must fail" )
 
         A = (/ 9,9,9,9,9,9,9,9,9,9,9,9,3 /)
         B = (/ 9,9,9,9,9,9,9,9,9,9,9,9,4 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, compress leading" )
+        call unittest_eq( A,B, comment="large_vector, compress leading, must fail" )
 
         A = (/ 1,2,9,9,9,9,9,9,9,9,9,9,9 /)
         B = (/ 2,2,9,9,9,9,9,9,9,9,9,9,9 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, compress trailing" )
+        call unittest_eq( A,B, comment="large_vector, compress trailing, must fail" )
         
         A = (/ 1,2,3,4,5,6,7,8,9,8,7,6,5,4,5,6 /)
         B = (/ 2,2,9,9,9,9,9,9,9,9,9,9,9,3,5,3 /)
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_vector, truncated" )
+        call unittest_eq( A,B, comment="large_vector, truncated, must fail" )
         
     end subroutine large_vector
     
     subroutine large_matrix()
         integer, dimension(:,:), allocatable :: A,B
-        integer, dimension(:,:,:), allocatable :: BB
-        type(error) :: inform
         
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, equal" )
+        call unittest_eq( A,B, comment="large_matrix, equal" )
         
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 1,2,9,9,9,3 /),(/2,3/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, different size" )
+        call unittest_eq( A,B, comment="large_matrix, different size, must fail" )
         
         ! large matrix: compress equal parts and show indexes
         A = reshape((/ 1,2,9,9,9,3 /),(/3,2/))
         B = reshape((/ 3,1,9,9,9,2 /),(/3,2/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, short" )
+        call unittest_eq( A,B, comment="large_matrix, short, must fail" )
 
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,3 /),(/4,3/))
         B = reshape((/ 3,1,9,9,9,9,9,9,9,9,9,2 /),(/4,3/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, compress middle" )
+        call unittest_eq( A,B, comment="large_matrix, compress middle, must fail" )
         
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,3,1,2,3 /),(/5,3/))
         B = reshape((/ 3,2,9,9,9,9,9,9,9,9,9,3,2,2,4 /),(/5,3/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, compress several" )
+        call unittest_eq( A,B, comment="large_matrix, compress several, must fail" )
 
         A = reshape((/ 9,9,9,9,9,9,9,9,9,9,9,3 /),(/4,3/))
         B = reshape((/ 9,9,9,9,9,9,9,9,9,9,9,4 /),(/4,3/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, compress leading" )
+        call unittest_eq( A,B, comment="large_matrix, compress leading, must fail" )
 
         A = reshape((/ 1,2,9,9,9,9,9,9,9,9,9,9 /),(/4,3/))
         B = reshape((/ 1,2,8,9,9,9,9,9,9,9,9,9 /),(/4,3/))
-        call assert_eq( A,B, ifail=inform )
-        call my_report_error( inform, "large_matrix, compress trailing" )
+        call unittest_eq( A,B, comment="large_matrix, compress trailing, must fail" )
         
     end subroutine large_matrix
     
     subroutine relerr_vector()
         double precision, dimension(:), allocatable :: A,B
         double precision, parameter :: epsrel = 1.0d-3
-        type(error) :: inform
         
         B = 100*(/ 1.0001d0, 1.1d0, 0.9d0, 0.99999d0 /)
         A = 0*B+100
-        call assert_relerr(A,B,epsrel, ifail=inform)
-        call my_report_error( inform, "relerr_vector" )
+        call unittest_relerr(A,B,epsrel, comment="relerr_vector, must fail" )
         
     end subroutine relerr_vector
     
     subroutine abserr_vector()
         double precision, dimension(:), allocatable :: A,B
         double precision, parameter :: epsabs = 1.0d-3
-        type(error) :: inform
         
         B = (/ 1.0001, 1.1, 0.9, 0.99999 /)
         A = 0*B+1
-        call assert_abserr(A,B,epsabs, ifail=inform)
-        call my_report_error( inform, "abserr_vector")
+        call unittest_abserr(A,B,epsabs, comment="abserr_vector, must fail")
         
     end subroutine abserr_vector
     
     subroutine relerr_matrix()
         double precision, dimension(:,:), allocatable :: A,B
         double precision, parameter :: epsrel = 1.0d-3
-        type(error) :: inform
         
         B = reshape( 100*(/ 1.0001d0, 1.1d0, 0.9d0, 0.99999d0 /), (/2,2/) )
         A = 0*B+100
-        call assert_relerr(A,B,epsrel, ifail=inform)
-        call my_report_error( inform, "relerr_matrix" )
+        call unittest_relerr(A,B,epsrel, comment="relerr_matrix, must fail" )
         
     end subroutine relerr_matrix
     
     subroutine abserr_matrix()
         double precision, dimension(:,:), allocatable :: A,B
         double precision, parameter :: epsabs = 1.0d-3
-        type(error) :: inform
         
         B = reshape( (/ 1.0001, 1.1, 0.9, 0.99999 /), (/2,2/) )
         A = 0*B+1
-        call assert_abserr(A,B,epsabs, ifail=inform )
-        call my_report_error( inform, "abserr_matrix" )
+        call unittest_abserr(A,B,epsabs, comment="abserr_matrix, must fail" )
         
     end subroutine abserr_matrix
 

@@ -29,10 +29,12 @@ module design_by_contract
     logical :: check_precondition = .true.
     logical :: check_postcondition = .true.
     logical :: check_check = .true.
+    logical :: check_unittest = .true. ! TODO: .true. by definition?
     
     public :: skip_precondition
     public :: skip_postcondition
     public :: skip_check
+    public :: skip_unittest
     
     !--------------------------------------------------------------------------
     ! Settings
@@ -60,6 +62,11 @@ contains
           logical :: skip
           skip = .not. check_check
     end function skip_check
+    
+    function skip_unittest() result(skip)
+        logical :: skip
+        skip = .not. check_unittest
+    end function skip_unittest
 
     !--------------------------------------------------------------------------
     ! Settings

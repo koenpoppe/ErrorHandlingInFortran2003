@@ -27,7 +27,7 @@ module error_handling
     use error_handling_legacy
     use error_handling_common_errors
     use error_handling_common_wrappers
-    use error_handling_unit_test
+    use error_handling_unittest
     implicit none
     public
     save

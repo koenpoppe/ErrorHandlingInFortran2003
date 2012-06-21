@@ -22,20 +22,34 @@
 //
 
 // Stringification
-#define xstr(s) str(s)
-#define str(s) #s
+#define strstr(x) "x"
+#define str(x) strstr(x)
+
+#define CONTINUATION &#38; NEWLINE
 
 <xsl:for-each select="*">
     <xsl:if test="contains(name(.),'assert')">
         <xsl:variable name="name" select="name(.)"/>
 // <xsl:value-of select="$name"/>
-        <xsl:for-each select="str:split('ensure,require',',')">
-            <xsl:variable name="type" select="."/>
+		<xsl:for-each select="document('design_by_contract.xml')/dbc/type">
+        	<xsl:variable name="type" select="."/>
             <!-- comment, ifail, statement,a_name,b_name,filename,line,fmt -->
-#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>(a,b,...) \
-    call <xsl:value-of select="$name"/>( a,b,__VA_ARGS__,ab=str(a),bn=str(b),fn=__FILE__,ln=__LINE__ )
-#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>_ifail(a,b,...) \
-    call <xsl:value-of select="$name"/>( a,b,__VA_ARGS__,ifail,ab=str(a),bn=str(b),fn=__FILE__,ln=__LINE__ ); \
+			<xsl:if test="$name = 'assert_eq'">
+#define __<xsl:value-of select="$type"/>(a) \
+	call <xsl:value-of select="$name"/>( a,.true.,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ )
+			</xsl:if>
+			
+			<xsl:variable name="args">
+			<xsl:choose>
+				<xsl:when test="$name = 'assert_relerr'">a,b,epsrel</xsl:when>
+				<xsl:when test="$name = 'assert_abserr'">a,b,epsabs</xsl:when>
+				<xsl:otherwise>a,b</xsl:otherwise>
+			</xsl:choose>
+			</xsl:variable>
+#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>(<xsl:value-of select="$args"/>) \
+    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ )
+#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>_ifail(<xsl:value-of select="$args"/>) \
+    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ ); \
     if( is_error(ifail) ) return<xsl:text/>
         </xsl:for-each><xsl:text>
 </xsl:text>

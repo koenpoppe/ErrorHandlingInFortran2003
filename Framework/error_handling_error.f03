@@ -23,6 +23,12 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
+! TODO
+! 
+!   20120619 KP - Allow several reasons, for example when checking input arguments?
+!               - Describe prefix/suffix -> output as XML, JSON ?
+!               - Fallback version without autogenerate?
+! 
 module error_handling_error
 
     use ISO_FORTRAN_ENV, only: OUTPUT_UNIT

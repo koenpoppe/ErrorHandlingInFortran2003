@@ -3,4 +3,5 @@
 	<type>precondition</type>
 	<type>postcondition</type>
 	<type>check</type>
+	<type>unittest</type>
 </dbc>

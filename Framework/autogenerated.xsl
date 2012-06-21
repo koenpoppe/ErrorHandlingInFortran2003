@@ -171,6 +171,15 @@
 			</xsl:for-each>)<xsl:text/>
 		</xsl:if>
 	</xsl:template>
+	<xsl:template name="shape-specification-equal-val">
+		<xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
+		<xsl:if test="$rank &gt; 0">
+			<xsl:text/>(",<xsl:text/>
+			<xsl:for-each select="exsl:node-set($ranks)/*[ 0 &lt; . and . &lt;= $rank]">
+				<xsl:text/><xsl:if test=". &gt; 1">,</xsl:if>size(a,<xsl:value-of select="."/>)<xsl:text/>
+			</xsl:for-each>,")<xsl:text/>
+		</xsl:if>
+	</xsl:template>
 
 	<xsl:template name="module-procedure"><xsl:text>
         module procedure </xsl:text>	<xsl:call-template name="name-mangler"/>

@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<types>
+    <type format="L1">logical</type>
+    <type format="A20">character(len=*)</type>
+    <type format="I10">integer</type><!-- Default integer -->
+    <type format="ES13.6">real(kind=selected_real_kind(6,37))</type><!-- Single precision -->
+    <type format="ES22.15">real(kind=selected_real_kind(15,307))</type><!-- Double precision -->
+</types>
