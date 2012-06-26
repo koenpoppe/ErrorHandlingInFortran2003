@@ -22,6 +22,8 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
+! 2012-06-26 TODO: KP - What about different array bounds (i.e, allocate(a(0:4)) )
+!                     - Lazy allocation?
 module error_handling_common_wrappers
     use error_handling_error
     use error_handling_common_errors
@@ -47,7 +49,7 @@ end module error_handling_common_wrappers
     subroutine <xsl:call-template name="name-mangler"/>( array, sizes, ifail )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, allocatable, intent(out) :: array
         integer<xsl:call-template name="rank-dimension"/>, intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( <xsl:text/>
 <xsl:choose>

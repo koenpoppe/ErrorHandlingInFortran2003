@@ -637,14 +637,19 @@ contains
         integer :: nb_failed, nb_tests
         call unittest_results(nb_failed=nb_failed, nb_tests=nb_tests)
         if( nb_failed == 0 ) then
-            write(unit=*,fmt="(A)",advance="no") "     [OK] "
+            write(unit=*,fmt="(A)",advance="no") "    [OK] "
         else
-            write(unit=*,fmt="(A)",advance="no") "     [??] "
+            write(unit=*,fmt="(A)",advance="no") "    [??] "
         end if
-        write(unit=*,fmt="(I0,A,I0,A)",advance="no") &
-            nb_tests-nb_failed, " of ", nb_tests, " tests passed"
+        if( nb_failed == 0 ) then
+            write(unit=*,fmt="(A,I4,A)",advance="no") &
+                "All ", nb_tests, " tests passed!"
+        else
+            write(unit=*,fmt="(I4,A,I4,A)",advance="no") &
+                nb_tests-nb_failed, " of ", nb_tests, " tests passed"
+        end if
         if( len_trim(module_name) /= 0 ) &
-            write(unit=*,fmt="(3A)",advance="no") "(", trim(module_name), ")"
+            write(unit=*,fmt="(3A)",advance="no") " (", trim(module_name), ")"
         write(unit=*,fmt=*) ! New line
     end subroutine unittest_report
 

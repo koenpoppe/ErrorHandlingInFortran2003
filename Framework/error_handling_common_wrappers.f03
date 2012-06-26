@@ -15,6 +15,8 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
+! 2012-06-26 TODO: KP - What about different array bounds (i.e, allocate(a(0:4)) )
+!                     - Lazy allocation?
 module error_handling_common_wrappers
     use error_handling_error
     use error_handling_common_errors
@@ -43,7 +45,7 @@ contains
     subroutine allocate_logical_rank1( array, sizes, ifail )
         logical, dimension(:), allocatable, intent(out) :: array
         integer, intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes ), stat=stat )
         if( stat /= 0 ) then
@@ -59,7 +61,7 @@ contains
     subroutine allocate_logical_rank2( array, sizes, ifail )
         logical, dimension(:,:), allocatable, intent(out) :: array
         integer, dimension(2), intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes(1),sizes(2) ), stat=stat )
         if( stat /= 0 ) then
@@ -75,7 +77,7 @@ contains
     subroutine allocate_integer_rank1( array, sizes, ifail )
         integer, dimension(:), allocatable, intent(out) :: array
         integer, intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes ), stat=stat )
         if( stat /= 0 ) then
@@ -91,7 +93,7 @@ contains
     subroutine allocate_integer_rank2( array, sizes, ifail )
         integer, dimension(:,:), allocatable, intent(out) :: array
         integer, dimension(2), intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes(1),sizes(2) ), stat=stat )
         if( stat /= 0 ) then
@@ -107,7 +109,7 @@ contains
     subroutine allocate_real_6_37_rank1( array, sizes, ifail )
         real(kind=selected_real_kind(6,37)), dimension(:), allocatable, intent(out) :: array
         integer, intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes ), stat=stat )
         if( stat /= 0 ) then
@@ -123,7 +125,7 @@ contains
     subroutine allocate_real_6_37_rank2( array, sizes, ifail )
         real(kind=selected_real_kind(6,37)), dimension(:,:), allocatable, intent(out) :: array
         integer, dimension(2), intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes(1),sizes(2) ), stat=stat )
         if( stat /= 0 ) then
@@ -139,7 +141,7 @@ contains
     subroutine allocate_real_15_307_rank1( array, sizes, ifail )
         real(kind=selected_real_kind(15,307)), dimension(:), allocatable, intent(out) :: array
         integer, intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes ), stat=stat )
         if( stat /= 0 ) then
@@ -155,7 +157,7 @@ contains
     subroutine allocate_real_15_307_rank2( array, sizes, ifail )
         real(kind=selected_real_kind(15,307)), dimension(:,:), allocatable, intent(out) :: array
         integer, dimension(2), intent(in) :: sizes
-        type(error), intent(out) :: ifail
+        type(error), intent(out), optional :: ifail
         integer :: stat
         allocate( array( sizes(1),sizes(2) ), stat=stat )
         if( stat /= 0 ) then

@@ -15,6 +15,7 @@
 !                 Because info is intent(in), it gets deleted at the end of the method, 
 !                 and that results in a dangling pointer ...
 !   20111108 KP - Changed the write_to prototype
+!   20120626 KP - Added isnt_error convenience method
 ! 
 ! AUTHOR
 ! 
@@ -66,7 +67,7 @@ module error_handling_error
 #endif
     end type error
     
-    public :: is_error
+    public :: is_error, isnt_error
 
     ! 3. Sentinel no-error information type
     type, extends(error_info), public :: no_error
@@ -205,8 +206,13 @@ contains
     end function empty_error
     
     function is_error( exc ) result( is_exc )
-        class(error), intent(in) :: exc
+        class(error), intent(in), optional :: exc
         logical :: is_exc
+        
+        if( .not. present(exc) ) then
+            is_exc = .false.
+            return
+        end if
         
         if( associated( exc%info ) ) then
             select type( E => exc%info ) 
@@ -221,6 +227,12 @@ contains
         end if
         
     end function is_error
+    
+    function isnt_error( exc ) result( isnt_exc )
+        class(error), intent(in), optional :: exc
+        logical :: isnt_exc
+        isnt_exc = .not. is_error( exc )
+    end function isnt_error
     
     subroutine error_constructor( ifail, info, reason, method )
 

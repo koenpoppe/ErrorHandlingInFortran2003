@@ -25,7 +25,7 @@
 #define strstr(x) "x"
 #define str(x) strstr(x)
 
-#define CONTINUATION &#38; NEWLINE
+#define CONTINUATION &#38; NEWLINE            
 
 <xsl:for-each select="*">
     <xsl:if test="contains(name(.),'assert')">
@@ -37,6 +37,14 @@
 			<xsl:if test="$name = 'assert_eq'">
 #define __<xsl:value-of select="$type"/>(a) \
 	call <xsl:value-of select="$name"/>( a,.true.,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ )
+#define __<xsl:value-of select="$type"/>_ifail(a) \
+	call <xsl:value-of select="$name"/>( a,.true.,ifail=ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ ); NEWLINE\
+        if( is_error(ifail) ) return<xsl:text/>
+#define __<xsl:value-of select="$type"/>c(a,the_comment) \
+	call <xsl:value-of select="$name"/>( a,.true.,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION comment=the_comment,CONTINUATION filename=__FILE__,line=__LINE__ )
+#define __<xsl:value-of select="$type"/>_ifailc(a,the_comment) \
+	call <xsl:value-of select="$name"/>( a,.true.,ifail=ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION comment=the_comment,CONTINUATION filename=__FILE__,line=__LINE__ ); NEWLINE\
+        if( is_error(ifail) ) return<xsl:text/>
 			</xsl:if>
 			
 			<xsl:variable name="args">
@@ -49,8 +57,13 @@
 #define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>(<xsl:value-of select="$args"/>) \
     call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ )
 #define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>_ifail(<xsl:value-of select="$args"/>) \
-    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ ); \
-    if( is_error(ifail) ) return<xsl:text/>
+    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,ifail=ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION filename=__FILE__,line=__LINE__ ); NEWLINE\
+        if( is_error(ifail) ) return
+#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>c(<xsl:value-of select="$args"/>,the_comment) \
+    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION comment=the_comment,CONTINUATION filename=__FILE__,line=__LINE__ )
+#define __<xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>_ifailc(<xsl:value-of select="$args"/>,the_comment) \
+    call <xsl:value-of select="$type"/><xsl:value-of select="str:replace($name,'assert','')"/>( <xsl:value-of select="$args"/>,ifail=ifail,CONTINUATION a_name=str(a),b_name=str(b),CONTINUATION comment=the_comment,CONTINUATION filename=__FILE__,line=__LINE__ ); NEWLINE\
+        if( is_error(ifail) ) return<xsl:text/>
         </xsl:for-each><xsl:text>
 </xsl:text>
     </xsl:if>
