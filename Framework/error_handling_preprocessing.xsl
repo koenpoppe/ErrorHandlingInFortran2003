@@ -69,5 +69,21 @@
     </xsl:if>
 </xsl:for-each>
 
+// Error class
+        <xsl:for-each select="document('design_by_contract.xml')/dbc/type">
+            <xsl:variable name="type" select="."/>
+#define __<xsl:value-of select="$type"/>_errorclass(ifail,error_info_type) \
+    __<xsl:value-of select="$type"/>( is_error(ifail) ) NEWLINE \
+        if( is_error(ifail) ) then NEWLINE \
+            select type( info=>ifail%info ) NEWLINE \
+                class is( error_info_type ) NEWLINE \
+                    call <xsl:value-of select="$type"/>( .true., comment="The expected error_info_type" ) NEWLINE \
+                class default NEWLINE \
+                    call <xsl:value-of select="$type"/>( .false., comment="Expect error_info_type, but got something else", reason=ifail )NEWLINE \
+            end selectNEWLINE \
+        end if
+        </xsl:for-each>
+
+
     </xsl:template>
 </xsl:stylesheet>

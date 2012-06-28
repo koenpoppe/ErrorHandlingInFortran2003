@@ -37,6 +37,18 @@ module error_handling_common_errors
 #endif
     integer, dimension(:), private, allocatable :: allocation_error_requested_shape
 #endif
+
+	! - enumeration error
+	type, extends(error_info), public :: enumeration_error
+		integer :: enum
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
+		integer, dimension(:), allocatable :: enums
+		character(len=40), dimension(:), allocatable :: enum_descriptions
+		character(:), allocatable :: message
+#endif
+	contains
+		procedure :: write_to => enum_descriptions_write_to
+	end type enumeration_error
     
 contains
     
@@ -106,4 +118,32 @@ contains
         
     end subroutine iostat_error_write_to
 
+	subroutine enum_descriptions_write_to( info, unit, prefix, suffix )
+	    class(enumeration_error), intent(in) :: info
+	    integer, intent(in) :: unit
+	    character(len=*), intent(in) :: prefix, suffix
+		
+		integer :: i
+		logical :: show_default_message
+		character(len=20) :: fmt
+		
+		write(unit=unit,fmt="(2A,I0,2A)",advance="no") prefix, "Unexpected enumeration value ", info%enum, ", "
+		show_default_message = .true.
+		if( allocated(info%message) ) then
+			show_default_message = len_trim(info%message) > 0
+		end if
+		if( show_default_message ) then
+			write(unit=unit,fmt="(A)",advance="no") "expecting one of the following"
+		else
+			write(unit=unit,fmt="(A)",advance="no") trim(info%message)
+		end if
+		write(unit=unit,fmt="(2A)") ": ", suffix
+		write(unit=fmt,fmt="(A,I0,A,I0,A)") "(2A,A", maxval(len_trim(info%enum_descriptions)), & 
+			",A,I", 1+ceiling(log10(real(maxval(info%enums)))), ",A)"
+		do i=1,size(info%enums)
+			write(unit=unit,fmt=fmt,advance="no") prefix, "- ", info%enum_descriptions(i), " (=", info%enums(i), ")", suffix
+		end do
+		
+	end subroutine enum_descriptions_write_to
+	
 end module error_handling_common_errors

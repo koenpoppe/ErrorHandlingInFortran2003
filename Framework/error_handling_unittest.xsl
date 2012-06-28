@@ -4,7 +4,7 @@
 
     <xsl:variable name="ASSERT_OPTIONS">
         <xsl:text>&#38;
-                            comment, ifail, statement,a_name,b_name,filename,line,fmt</xsl:text>
+                            comment, ifail, statement,a_name,b_name,filename,line,fmt,reason</xsl:text>
     </xsl:variable>
     <xsl:variable name="ASSERT_OPTIONS_PRIMITIVE">
         <xsl:text>&#38;
@@ -13,7 +13,8 @@
     <xsl:variable name="ASSERT_OPTIONS_DECLARATION"><xsl:text/>
         character(len=*), intent(in), optional :: a_name,b_name,filename,comment, statement, fmt
         integer, intent(in), optional :: line
-        type(error), intent(out), optional :: ifail<xsl:text/>
+        type(error), intent(out), optional :: ifail
+        type(error), intent(in out), optional :: reason<xsl:text/>
     </xsl:variable>
     <xsl:variable name="ASSERT_OPTIONS_DECLARATION_PRIMITIVE"><xsl:text/>
         character(len=*), intent(in), optional :: filename,comment
@@ -749,7 +750,7 @@ contains<xsl:text/>
             call assert_eq( shape_a, shape_b, statement=statement, &amp; <!-- DEPENDS ON ASSERT_OPTIONS -->
                     a_name="shape(" // trim(optional_character(a_name,"a")) // ")", &amp;
                     b_name="shape(" // trim(optional_character(b_name,"b")) // ")", filename=filename, line=line, &amp;
-                    comment=trim(optional_character(comment)) // " sizes differ", ifail=ifail, fmt=fmt )
+                    comment=trim(optional_character(comment)) // " sizes differ", ifail=ifail, fmt=fmt, reason=reason )
             return
         end if
         equal_shape = .true.
@@ -932,7 +933,11 @@ end module error_handling_unittest<xsl:text/>
             info%show_difference_marks = .true.
             </xsl:if>
             ! Create the error and report failed
-            call create_error( ifail, info )
+            if( present(reason) ) then
+                call create_error( ifail, info, reason=reason )
+            else
+                call create_error( ifail, info )
+            end if
         end if
     end subroutine <xsl:call-template name="name-mangler"/>
     
@@ -1112,7 +1117,11 @@ end module error_handling_unittest<xsl:text/>
             info%extra_name = "<xsl:value-of select="$error_f"/>"
             
             ! Create the error and report failed
-            call create_error( ifail, info )
+            if( present(reason) ) then
+                call create_error( ifail, info, reason=reason )
+            else
+                call create_error( ifail, info )
+            end if
             call assertion_failed()
         end if
     end subroutine <xsl:call-template name="name-mangler"/>

@@ -13,6 +13,7 @@ FC=nagfor_beta
 FFLAGS_nagfor_beta=-f2003 -colour -v -fpp
 FFLAGS_nagfor_beta+=-mdir $(LIBDIR) -I $(LIBDIR) 
 FFLAGS_nagfor_beta+=-O0 -C=all -g90
+FFLAGS_nagfor_beta+=-w=uda # Avoid warnings over unused ifail output arguments
 
 # nagfor = NAG Fortran Compiler Release 5.2(752)
 #    - Panic: /tmp/design_by_contract.018101.f90: Unexpected expr node type 0
