@@ -111,6 +111,7 @@
 	<xsl:template name="procedures">
 		<xsl:for-each select="*">
 <xsl:text/>
+
     !--------------------------------------------------------------------------
     ! Procedure <xsl:value-of select="name(.)"/>
 <xsl:if test="@comment">
