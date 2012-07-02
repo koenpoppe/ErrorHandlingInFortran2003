@@ -44,17 +44,20 @@ end module error_handling_common_wrappers
     
     <xsl:template match="allocate">
         <xsl:param name="version"/>
+		<xsl:param name="extra" select="@extra"/>
+		<xsl:choose>
+			<xsl:when test="$extra = 'size'">
+			
         <xsl:for-each select="exsl:node-set($version)">
             <xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
     subroutine <xsl:call-template name="name-mangler"/>( array, sizes, ifail )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, allocatable, intent(out) :: array
         integer<xsl:call-template name="rank-dimension"/>, intent(in) :: sizes
         type(error), intent(out), optional :: ifail
-        integer :: stat
-        allocate( array( <xsl:text/>
-<xsl:choose>
+        integer :: stat, i
+        allocate( array( <xsl:text/><xsl:choose>
             <xsl:when test="@rank = 1">
-                <xsl:text>sizes</xsl:text>
+                <xsl:text/>sizes<xsl:text/>
             </xsl:when>
             <xsl:otherwise>
 <xsl:text/><xsl:for-each select="exsl:node-set($counter)/*[. &lt;= $rank]"><xsl:if test=". &gt; 1 ">,</xsl:if> <xsl:text>sizes(</xsl:text><xsl:value-of select="."/><xsl:text>)</xsl:text></xsl:for-each></xsl:otherwise>
@@ -67,13 +70,52 @@ end module error_handling_common_wrappers
 #else
                 allocation_error( &amp;
 #endif
-                 stat, <xsl:if test="@rank = 1">(/ </xsl:if>sizes<xsl:if test="@rank = 1"> /)</xsl:if> ) )
+                 stat, (/ ( 1, i=1, <xsl:value-of select="@rank"/> ) /), <xsl:if test="@rank = 1">(/ </xsl:if>sizes<xsl:if test="@rank = 1"> /)</xsl:if> ) )
         end if
     end subroutine <xsl:call-template name="name-mangler"/>
         </xsl:for-each>
+		
+			</xsl:when>
+			<xsl:when test="$extra = 'lowerupper'">
+				
+        <xsl:for-each select="exsl:node-set($version)">
+            <xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
+    subroutine <xsl:call-template name="name-mangler"/>( array, lower, upper, ifail )
+        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, allocatable, intent(out) :: array
+        integer<xsl:call-template name="rank-dimension"/>, intent(in) :: lower, upper
+        type(error), intent(out), optional :: ifail
+        integer :: stat
+        allocate( array( <xsl:text/><xsl:choose>
+            <xsl:when test="@rank = 1">
+                <xsl:text/>lower:upper<xsl:text/>
+            </xsl:when>
+            <xsl:otherwise>
+<xsl:text/><xsl:for-each select="exsl:node-set($counter)/*[. &lt;= $rank]"><xsl:if test=". &gt; 1 ">,</xsl:if> <xsl:text>lower(</xsl:text><xsl:value-of select="."/><xsl:text>):upper(</xsl:text><xsl:value-of select="."/><xsl:text>)</xsl:text></xsl:for-each></xsl:otherwise>
+        </xsl:choose>
+        <xsl:text/> ), stat=stat )
+        if( stat /= 0 ) then
+            call create_error( ifail, &amp;
+#ifdef FC_NO_DT_CONSTRUCTOR
+                allocation_error_constructor( &amp;
+#else
+                allocation_error( &amp;
+#endif
+                 stat, <xsl:if test="@rank = 1">(/ </xsl:if>lower<xsl:if test="@rank = 1"> /)</xsl:if>, <xsl:if test="@rank = 1">(/ </xsl:if>upper<xsl:if test="@rank = 1"> /)</xsl:if> ) )
+        end if
+    end subroutine <xsl:call-template name="name-mangler"/>
+        </xsl:for-each>
+				
+			</xsl:when>
+		</xsl:choose>
+		
+		
     </xsl:template>
     <xsl:template match="lazy_allocate">
         <xsl:param name="version"/>
+		<xsl:param name="extra" select="@extra"/>
+		<xsl:choose>
+			<xsl:when test="$extra = 'size'">
+		
         <xsl:for-each select="exsl:node-set($version)">
             <xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
     subroutine <xsl:call-template name="name-mangler"/>( array, sizes, ifail )
@@ -98,6 +140,37 @@ end module error_handling_common_wrappers
         call allocate( array, sizes, ifail )
     end subroutine <xsl:call-template name="name-mangler"/>
         </xsl:for-each>
+
+			</xsl:when>
+			<xsl:when test="$extra = 'lowerupper'">
+
+        <xsl:for-each select="exsl:node-set($version)">
+            <xsl:variable name="rank"><xsl:value-of select="@rank"/></xsl:variable>
+    subroutine <xsl:call-template name="name-mangler"/>( array, lower, upper, ifail )
+        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, allocatable, intent(in out) :: array
+        integer<xsl:call-template name="rank-dimension"/>, intent(in) :: lower, upper
+        type(error), intent(out), optional :: ifail
+        
+        if( allocated(array) ) then<xsl:text/>
+		<xsl:choose>
+			<xsl:when test="@rank = 1">
+            if( lbound(array,1) == lower .and. ubound(array,1) == upper ) then<xsl:text/>
+			</xsl:when>
+			<xsl:otherwise>
+            if( all( lbound(array) == lower ) .and. all( ubound(array) == upper ) ) then<xsl:text/>
+			</xsl:otherwise>
+		</xsl:choose>
+                return ! OK, no need to re-allocate
+            end if
+            ! Wrong shape -> re-allocate
+            deallocate( array )
+        end if
+        call allocate( array, lower, upper, ifail )
+    end subroutine <xsl:call-template name="name-mangler"/>
+        </xsl:for-each>
+		
+			</xsl:when>
+		</xsl:choose>
     </xsl:template>
     
     <xsl:include href="autogenerated.xsl"/>

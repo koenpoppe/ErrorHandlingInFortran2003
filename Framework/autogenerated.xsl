@@ -41,6 +41,10 @@
 		</xsl:choose>
 	</xsl:template>
 	
+	<xsl:template match="variant">
+		
+	</xsl:template>
+	
 	<xsl:template match="alltypes_allranks">
 		<xsl:param name="callback"/>
 		
@@ -98,7 +102,8 @@
 	<xsl:template name="interfaces">
 		<xsl:param name="cursor" select="."/>
 		<xsl:for-each select="exsl:node-set($cursor)/*">
-        <xsl:if test="name(preceding-sibling::*) != name(.)">
+			<xsl:variable name="name" select="name(.)"/>
+        <xsl:if test="count(preceding-sibling::*[name(.) = $name])=0">
 <xsl:text/>    public :: <xsl:value-of select="name(.)"/></xsl:if>
     interface <xsl:value-of select="name(.)"/>
 			<xsl:apply-templates select="*">

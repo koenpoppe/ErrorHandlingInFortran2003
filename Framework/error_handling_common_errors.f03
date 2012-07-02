@@ -22,7 +22,7 @@ module error_handling_common_errors
     type, extends(error_info), public :: allocation_error
         integer :: error_code
 #ifndef FC_NO_ALLOCATABLE_DTCOMP
-        integer, dimension(:), allocatable :: requested_shape
+        integer, dimension(:), allocatable :: requested_lower, requested_upper
 #endif
     contains
         procedure :: write_to => allocation_error_write_to
@@ -35,7 +35,7 @@ module error_handling_common_errors
         module procedure allocation_error_constructor
     end interface allocation_error
 #endif
-    integer, dimension(:), private, allocatable :: allocation_error_requested_shape
+    integer, dimension(:), private, allocatable :: allocation_error_requested_lower, allocation_error_requested_upper
 #endif
 
 	! - enumeration error
@@ -53,13 +53,14 @@ module error_handling_common_errors
 contains
     
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
-    function allocation_error_constructor( error_code, requested_shape ) result( info )
+    function allocation_error_constructor( error_code, requested_lower, requested_upper ) result( info )
         integer, intent(in) :: error_code
-        integer, dimension(:), intent(in) :: requested_shape
+        integer, dimension(:), intent(in) :: requested_lower, requested_upper
         type(allocation_error) :: info
         
         info%error_code = error_code
-        allocation_error_requested_shape = requested_shape
+        allocation_error_requested_lower = requested_lower
+        allocation_error_requested_upper = requested_upper
         
     end function allocation_error_constructor
 #endif
@@ -68,20 +69,27 @@ contains
         class(allocation_error), intent(in) :: info
         integer, intent(in) :: unit
         character(len=*), intent(in) :: prefix, suffix
+		
+		integer :: i
         
         ! TODO: remove workarround for allocatable derived type components
 #ifndef FC_NO_ALLOCATABLE_DTCOMP
-        associate( requested_shape => info%requested_shape )
+        associate( lower=>info%requested_lower, upper=>info%requested_upper )
 #else
-        associate( requested_shape => allocation_error_requested_shape )
+        associate( lower=>allocation_error_requested_lower, upper=>allocation_error_requested_upper )
 #endif
-            if( size(requested_shape)  == 1 ) then
-                write(unit=unit,fmt="(2A,I0,A,I0,2A)") prefix, &
-                    "Allocating array with ", requested_shape, & 
-                    " elements did not work (error code ", info%error_code, ").", suffix
+            if( size(lower)  == 1 ) then
+                write(unit=unit,fmt="(2A,I0,A,I0,A,I0,2A)") prefix, &
+                    "Allocating array(", lower, ":", upper, & 
+                    ") did not work (error code ", info%error_code, ").", suffix
             else
-                write(unit=unit,fmt=*) prefix, "Allocating array of shape ", requested_shape, & 
-                    " (=", product(requested_shape), & 
+                write(unit=unit,fmt="(2A)",advance="no") prefix, "Allocating array( "
+				do i=1,size(lower)
+					if( i>1 ) write(unit=unit,fmt="(A)",advance="no") ", "
+					write(unit=unit,fmt="(I0,A,I0)",advance="no") lower(i), ":", upper(i) 
+				end do
+				write(unit=unit,fmt="(A,I0,A,I0,2A)") &
+                    " (=", product(upper-lower+1), & 
                     " elements) did not work (error code ", info%error_code, ").", suffix
             end if
         end associate

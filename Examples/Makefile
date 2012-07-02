@@ -31,7 +31,7 @@ clean:
 
 # The available examples and the selected one
 EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test
-EXAMPLE=unittest_test
+EXAMPLE=common_wrappers
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))

@@ -1,11 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wrappers>
-	<allocate>
+	<allocate extra="size">
 		<alltypes_allranks minrank="1" typefilter="logical"/>
 		<alltypes_allranks minrank="1" typefilter="integer"/>
 		<alltypes_allranks minrank="1" typefilter="real"/>
 	</allocate>
-	<lazy_allocate>
+	<allocate extra="lowerupper">
+		<alltypes_allranks minrank="1" typefilter="logical"/>
+		<alltypes_allranks minrank="1" typefilter="integer"/>
+		<alltypes_allranks minrank="1" typefilter="real"/>
+	</allocate>
+	<lazy_allocate extra="size">
+		<alltypes_allranks minrank="1" typefilter="logical"/>
+		<alltypes_allranks minrank="1" typefilter="integer"/>
+		<alltypes_allranks minrank="1" typefilter="real"/>
+	</lazy_allocate>
+	<lazy_allocate extra="lowerupper">
 		<alltypes_allranks minrank="1" typefilter="logical"/>
 		<alltypes_allranks minrank="1" typefilter="integer"/>
 		<alltypes_allranks minrank="1" typefilter="real"/>
