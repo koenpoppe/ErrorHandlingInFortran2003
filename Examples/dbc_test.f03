@@ -64,8 +64,8 @@ contains
         
         ! Postconditions
         select case(n)
-            case( 0:1 )
-                call postcondition_eq( fact,1,"Definition 0! and 1!", ifail, & 
+            case( 0 )
+                call postcondition_eq( fact,1,"Definition 0!", ifail, & 
                     a_name="fact",b_name="1",filename="dbc_test.f03",line=69 )
             case default
                 call postcondition_ge( fact,1,"Factorial positive", ifail, &

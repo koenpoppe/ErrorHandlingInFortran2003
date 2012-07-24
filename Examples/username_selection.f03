@@ -43,14 +43,21 @@ module username_selection
     
 #ifdef ERROR_HANDLING
     type, extends(message_error) :: username_error
-#ifndef FC_NO_ALLOCATABLE_DTCOMP
-        character(:), allocatable :: username, proposed_alternative
-#else
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
         character(len=MAX_CHARACTER_LEN) :: username = "", proposed_alternative = ""
+#else
+        character(:), allocatable :: username, proposed_alternative
 #endif
     contains
         procedure :: write_to => username_error_write_to
     end type username_error
+#endif
+
+#ifdef FC_NO_DT_CONSTRUCTOR
+    public :: username_error
+    interface username_error
+        module procedure username_error_constructor
+    end interface username_error
 #endif
 
 contains
@@ -226,6 +233,18 @@ contains
     end subroutine change_future
 
 #ifdef ERROR_HANDLING
+#ifdef FC_NO_DT_CONSTRUCTOR
+    function username_error_constructor( message, username, proposed_alternative ) result( info )
+        character(len=*), intent(in) :: message, username, proposed_alternative
+        type(username_error) :: info
+        
+        info%message = message
+        info%username = username
+        info%proposed_alternative = proposed_alternative
+        
+    end function username_error_constructor
+#endif
+
     subroutine username_error_write_to( info, unit, prefix, suffix )
         class(username_error), intent(in) :: info
         integer, intent(in) :: unit

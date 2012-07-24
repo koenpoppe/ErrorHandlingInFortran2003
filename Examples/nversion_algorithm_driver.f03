@@ -8,8 +8,8 @@ program nversion_algorithm_driver
     implicit none
     
     integer :: Ni
-    integer, dimension(:), allocatable :: Ns
-    Ns = (/ 100, 1000, 1000000, 1000001, 1000002 /)
+    integer, dimension(5), parameter :: Ns = &
+         (/ 100, 1000, 1000000, 1000001, 1000002 /)
     
     do Ni=1,size(Ns)
          call driver_one( Ns(Ni) )

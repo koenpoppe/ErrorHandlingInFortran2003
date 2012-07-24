@@ -10,8 +10,8 @@ program username_selection_driver
     implicit none
     
     integer :: namei
-    character(len=8), dimension(:), allocatable :: usernames
-    usernames = (/ "        ","Koen    ",  "Koen 123", "Koen.123" /)
+    character(len=8), dimension(4), parameter :: usernames = &
+        (/ "        ","Koen    ",  "Koen 123", "Koen.123" /)
     do namei=1,size(usernames)
         call run_testcase(usernames(namei))
     end do

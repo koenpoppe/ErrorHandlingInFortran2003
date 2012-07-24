@@ -22,7 +22,7 @@ program unittest_test_driver
     open(unit=unit,file="unittest_test_driver.txt",action="write",status="unknown")
 !     call set_report_error_unit( unit )
     
-    call unit_test_reset( "unittest_test_driver" )
+    call unittest_reset( "unittest_test_driver" )
     
 !     call primitive()
 !     call scalar()
@@ -36,7 +36,7 @@ program unittest_test_driver
     call relerr_vector()
     call relerr_matrix()
     
-    call write_unit_test_report()
+    call unittest_report()
     
     close(unit=unit)
 

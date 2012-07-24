@@ -14,9 +14,9 @@
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
 program common_wrappers_driver
-	use common_wrappers
-	implicit none
+    use common_wrappers
+    implicit none
 
-	call test_allocation()
+    call test_allocation()
 
 end program common_wrappers_driver

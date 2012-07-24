@@ -42,10 +42,10 @@ module fragile_input
 #ifdef ERROR_HANDLING
     type, extends(error_info) :: fragile_input_error
         integer :: nb_attempts
-#ifndef FC_NO_ALLOCATABLE_DTCOMP
-        character(:), allocatable :: input_type
-#else
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
         character(MAX_CHARACTER_LEN) :: input_type = ""
+#else
+        character(:), allocatable :: input_type
 #endif
     contains
         procedure, pass :: write_to => fragile_input_error_write_to
@@ -199,7 +199,7 @@ contains
         character(len=*), intent(in) :: prefix, suffix
         
         write(unit=unit,fmt="(4A,I0,2A)") prefix, & 
-            "Failed reading a valid ", info%input_type, " within ", & 
+            "Failed reading a valid ", trim(info%input_type), " within ", & 
             info%nb_attempts, " attempts", suffix
     
     end subroutine fragile_input_error_write_to
