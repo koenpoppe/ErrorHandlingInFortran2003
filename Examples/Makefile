@@ -1,26 +1,36 @@
 first: one
 
-.PHONY: clean cleanpreprocs cleandrivers cleanlogs all
-MAKEFLAGS+= --no-print-directory
+###############################################################################
+# Fortran compiler
 
-# Library
-LIBRARY_DIR=../Framework/$(FC)_build/
-LIBRARY=-lerror_handling
+# FC=nagfor_beta
+# FC=gfortran_beta
+FC=ifort_beta
 
-# Fortran compiler and flags
-FC=nagfor_beta
 FPP=$(FC)
 
-FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90 -u
-FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
+# Library
+LIBRARY_PATH=../Framework/
+include $(LIBRARY_PATH)makefile.inc
+LIBRARY_DIR=$(LIBRARY_PATH)$(FC)_build/
+LIBRARY=-lerror_handling
 
-FFLAGS_ifort_beta=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
-FFLAGS_ifort=$(FFLAGS_ifort_beta)
-
-FFLAGS_gfortran_beta=-std=f2008 -J $(LIBRARY_DIR) -cpp -O0 -g -DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP
-FFLAGS_gfortran=$(FFLAGS_gfortran_beta)
+# Extra flags
+FFLAGS_gfortran_beta+=-J $(LIBRARY_DIR)
+FFLAGS_ifort_beta:=-I $(LIBRARY_DIR) $(FFLAGS_ifort_beta)
+FFLAGS_nagfor_beta+= -I $(LIBRARY_DIR)
 
 FFLAGS=$(FFLAGS_$(FC))
+
+# Command to get version
+FC_VERSION_CMD_gfortran_beta=$(FC) --version
+FC_VERSION_CMD_ifort_beta=$(FC) --version
+FC_VERSION_CMD_nagfor_beta=$(FC) -V
+FC_VERSION_CMD=$(FC_VERSION_CMD_$(FC))
+
+###############################################################################
+.PHONY: clean cleanpreprocs cleandrivers cleanlogs all
+MAKEFLAGS+= --no-print-directory
 
 LDFLAGS= -L$(LIBRARY_DIR) $(LIBRARY)
 %.o: %.f03
@@ -29,9 +39,10 @@ LDFLAGS= -L$(LIBRARY_DIR) $(LIBRARY)
 clean:
 	$(RM) *.o *.mod *.g90
 
+###############################################################################
 # The available examples and the selected one
 EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test
-EXAMPLE=common_wrappers
+EXAMPLE=nversion_algorithm
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))
@@ -133,7 +144,9 @@ allclean:
 REGRESSION_FILENAME="regression/$(FC)_$(shell date +'%Y%m%d').txt"
 regression: veryclean all
 	@echo $(REGRESSION_FILENAME)
-	@date > $(REGRESSION_FILENAME)
+	@$(FC_VERSION_CMD) 1>  $(REGRESSION_FILENAME)
+	@$(FC_VERSION_CMD) 2>> $(REGRESSION_FILENAME)
+	@date >> $(REGRESSION_FILENAME)
 	@$(foreach EX,$(DRIVERS_PROG), echo "\n=== $(EX) ====================================" >> $(REGRESSION_FILENAME) ; ./$(EX) >> $(REGRESSION_FILENAME) ; )
 
 # Testing purpose
