@@ -103,8 +103,8 @@
 		<xsl:param name="cursor" select="."/>
 		<xsl:for-each select="exsl:node-set($cursor)/*">
 			<xsl:variable name="name" select="name(.)"/>
-        <xsl:if test="count(preceding-sibling::*[name(.) = $name])=0">
-<xsl:text/>    public :: <xsl:value-of select="name(.)"/></xsl:if>
+			<xsl:if test="count(preceding-sibling::*[name(.) = $name])=0">
+    public :: <xsl:value-of select="name(.)"/></xsl:if>
     interface <xsl:value-of select="name(.)"/>
 			<xsl:apply-templates select="*">
 				<xsl:with-param name="callback">module-procedure</xsl:with-param>
@@ -139,6 +139,19 @@
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:template>
+    
+	<xsl:template name="rank-colons">
+		<xsl:param name="rank" select="@rank"/>
+		<xsl:choose>
+			<xsl:when test="$rank = 0">
+				<!-- NOP -->
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>(</xsl:text><xsl:for-each select="exsl:node-set($ranks)/rank[ 0 &lt; . and . &lt;= $rank]"><xsl:if test=". &gt; 1 ">,</xsl:if>:</xsl:for-each><xsl:text>)</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:template>
+    
 	
 	<xsl:template name="rank-dimension">
 		<xsl:choose>

@@ -49,23 +49,27 @@ contains
     !--------------------------------------------------------------------------
 
     function skip_precondition() result(skip)
-          logical :: skip
-          skip = .not. check_precondition
+        logical :: skip
+        skip = .not. check_precondition
+        if( skip ) print *, "skip_precondition"
     end function skip_precondition
     
     function skip_postcondition() result(skip)
-          logical :: skip
-          skip = .not. check_postcondition
+        logical :: skip
+        skip = .not. check_postcondition
+          if( skip ) print *, "skip_postcondition"
     end function skip_postcondition
     
     function skip_check() result(skip)
-          logical :: skip
-          skip = .not. check_check
+        logical :: skip
+        skip = .not. check_check
+          if( skip ) print *, "skip_postcondition"
     end function skip_check
     
     function skip_unittest() result(skip)
         logical :: skip
         skip = .not. check_unittest
+        if( skip ) print *, "skip_postcondition"
     end function skip_unittest
 
     !--------------------------------------------------------------------------

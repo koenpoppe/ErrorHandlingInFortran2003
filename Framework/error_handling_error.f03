@@ -51,6 +51,10 @@ module error_handling_error
     ! 2. Errors itself
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
     integer, parameter, public :: MAX_CHARACTER_LEN=1024
+#else
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+    integer, parameter, public :: MAX_CHARACTER_LEN=1024
+#endif
 #endif
     type, public :: error
         class(error_info), pointer :: info => NULL()

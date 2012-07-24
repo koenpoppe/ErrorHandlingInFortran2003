@@ -133,7 +133,11 @@ module error_handling_unittest
     type, extends(unittest_error) :: unittest_error_rank<xsl:value-of select="."/>
 #ifndef FC_NO_ALLOCATABLE_DTCOMP
         logical<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template><xsl:if test=". &gt; 0">, allocatable</xsl:if> :: diff
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+        character(MAX_CHARACTER_LEN)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
+#else
         character(:)<xsl:call-template name="rank-specification"><xsl:with-param name="rank" select="."/></xsl:call-template>, allocatable :: a,b, extra
+#endif
 #endif
     contains
         procedure :: write_to => unittest_error_write_to_rank<xsl:value-of select="."/>
@@ -229,28 +233,19 @@ contains<xsl:text/>
     ! Primitives
     !--------------------------------------------------------------------------
     
-    subroutine assertion_failed()
-        if( ntest >= 0 ) then
-            ntest = ntest + 1
-            nfail = nfail + 1
-        end if
-    end subroutine assertion_failed
-    
-    subroutine assertion_succeeded()
-        if( ntest >= 0 ) then
-            ntest = ntest + 1
-        end if
-    end subroutine assertion_succeeded
-    
-    subroutine handle_unittest( ifail )
+    subroutine handle_unittest( ifail, ifail_argument )
         type(error), intent(in out) :: ifail
+        type(error), intent(out), optional :: ifail_argument
+        ntest = ntest + 1
         if( is_error( ifail ) ) then
-            call assertion_failed()
+            nfail = nfail + 1
+            if( present(ifail_argument) ) then
+                print *, "*** Experimental: handle_unittest with ifail_argument"
+                ifail_argument = ifail ! Copy
+            end if
             print *, "<unittest>"
             call report_error( ifail )
             print *, "</unittest>"
-        else
-            call assertion_succeeded()
         end if
     end subroutine handle_unittest
     
@@ -260,10 +255,10 @@ contains<xsl:text/>
         
         call assert_eq( expression, .true., <xsl:value-of select="$ASSERT_OPTIONS"/> )
     end subroutine assert_logical
-    
-    <xsl:for-each select="document('design_by_contract.xml')/dbc/type">
-        <xsl:choose>
-            <xsl:when test=". = 'unittest'">
+    <xsl:text/>
+	<xsl:for-each select="document('design_by_contract.xml')/dbc/type">
+		<xsl:choose>
+			<xsl:when test=". = 'unittest'">
     subroutine <xsl:value-of select="."/>_logical( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         logical, intent(in) :: expression
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
@@ -271,20 +266,20 @@ contains<xsl:text/>
         if( skip_<xsl:value-of select="."/>() ) return
         associate( ifail=>local_ifail )
             call assert_logical( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-            call handle_unittest( ifail )
         end associate
-    end subroutine <xsl:value-of select="."/>_logical
-            </xsl:when>
-            <xsl:otherwise>
+        call handle_unittest( local_ifail, ifail )
+    end subroutine <xsl:value-of select="."/>_logical<xsl:text/>
+			</xsl:when>
+			<xsl:otherwise>
     subroutine <xsl:value-of select="."/>_logical( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         logical, intent(in) :: expression
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         if( skip_<xsl:value-of select="."/>() ) return
         call assert_logical( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-    end subroutine <xsl:value-of select="."/>_logical
+    end subroutine <xsl:value-of select="."/>_logical<xsl:text/>
 			</xsl:otherwise>
 		</xsl:choose>
-    </xsl:for-each>
+	</xsl:for-each>
     
     function assertion_fails( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> ) result( failed )
         logical, intent(in) :: expression
@@ -873,8 +868,11 @@ end module error_handling_unittest<xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         
         ! Local variables
-        character(:)<xsl:call-template name="deferred-rank-specification-equal"/>
-        <xsl:text/>, allocatable :: a_str, b_str<xsl:text/>
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+        character(MAX_CHARACTER_LEN)<xsl:call-template name="deferred-rank-specification-equal"/>, allocatable :: a_str, b_str
+#else
+        character(:)<xsl:call-template name="deferred-rank-specification-equal"/>, allocatable :: a_str, b_str
+#endif
         character(len=40) :: lfmt
         integer :: lfmt_width, stat
         <xsl:if test="$rank &gt; 0"><xsl:text/>
@@ -888,11 +886,19 @@ end module error_handling_unittest<xsl:text/>
             ! Export the data as character string<xsl:text/>
             lfmt = "(<xsl:call-template name="type-format-w-optional"/>)"
             lfmt_width = fmt_width( lfmt )
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+            allocate(a_str<xsl:call-template name="shape-specification-equal"/>,stat=stat)
+#else
             allocate(a_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width),stat=stat)
+#endif
             if( stat /= 0 ) print *, "*** Internal error: could not allocate ", &#38;
                 "a_str<xsl:call-template name="shape-specification-equal-val"/>, lfmt_width=", &#38;
                 lfmt_width, " (<xsl:call-template name="name-mangler"/>)"
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+            allocate(b_str<xsl:call-template name="shape-specification-equal"/>,stat=stat)
+#else
             allocate(b_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width),stat=stat)
+#endif
             if( stat /= 0 ) print *, "*** Internal error: could not allocate ", &#38;
                 "b_str<xsl:call-template name="shape-specification-equal-val"/>, lfmt_width=", &#38;
                 lfmt_width, " (<xsl:call-template name="name-mangler"/>)"
@@ -941,41 +947,41 @@ end module error_handling_unittest<xsl:text/>
         end if
     end subroutine <xsl:call-template name="name-mangler"/>
     
-    <xsl:variable name="cursor" select="."/>
-    <xsl:for-each select="document('design_by_contract.xml')/dbc/type">
-        <xsl:variable name="type" select="."/>
-        <xsl:choose>
-            <xsl:when test="$type = 'unittest'">
-                <xsl:for-each select="exsl:node-set($cursor)">
-                    <xsl:variable name="mangled"><xsl:call-template name="name-mangler"/></xsl:variable>
-                    <xsl:variable name="subroutinemangled"><xsl:value-of select="$type"/>_<xsl:value-of select="str:replace($mangled,'assert_','')"/></xsl:variable>
-            subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-                 <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b<xsl:text/>
-                <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
-                type(error) :: local_ifail
-                if( skip_<xsl:value-of select="$type"/>() ) return
-                associate( ifail=>local_ifail )
-                    call <xsl:call-template name="name-mangler"/>( a,b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-                    call handle_unittest( ifail )
-                end associate
-            end subroutine <xsl:value-of select="$subroutinemangled"/>
-                </xsl:for-each>
-            </xsl:when>
-            <xsl:otherwise>
-                <xsl:for-each select="exsl:node-set($cursor)">
-                    <xsl:variable name="mangled"><xsl:call-template name="name-mangler"/></xsl:variable>
-                    <xsl:variable name="subroutinemangled"><xsl:value-of select="$type"/>_<xsl:value-of select="str:replace($mangled,'assert_','')"/></xsl:variable>
-            subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-                 <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b<xsl:text/>
-                <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
+	<xsl:variable name="cursor" select="."/>
+	<xsl:for-each select="document('design_by_contract.xml')/dbc/type">
+		<xsl:variable name="type" select="."/>
+		<xsl:choose>
+			<xsl:when test="$type = 'unittest'">
+				<xsl:for-each select="exsl:node-set($cursor)">
+					<xsl:variable name="mangled"><xsl:call-template name="name-mangler"/></xsl:variable>
+					<xsl:variable name="subroutinemangled"><xsl:value-of select="$type"/>_<xsl:value-of select="str:replace($mangled,'assert_','')"/></xsl:variable>
+    subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
+        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b<xsl:text/>
+        <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
+        type(error) :: local_ifail
+        if( skip_<xsl:value-of select="$type"/>() ) return
+        associate( ifail=>local_ifail )
+            call <xsl:call-template name="name-mangler"/>( a,b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
+        end associate
+        call handle_unittest( local_ifail, ifail )
+    end subroutine <xsl:value-of select="$subroutinemangled"/>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:for-each select="exsl:node-set($cursor)">
+					<xsl:variable name="mangled"><xsl:call-template name="name-mangler"/></xsl:variable>
+					<xsl:variable name="subroutinemangled"><xsl:value-of select="$type"/>_<xsl:value-of select="str:replace($mangled,'assert_','')"/></xsl:variable>
+    subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
+        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b<xsl:text/>
+        <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         
-                if( skip_<xsl:value-of select="$type"/>() ) return
-                call <xsl:call-template name="name-mangler"/>( a,b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-            end subroutine <xsl:value-of select="$subroutinemangled"/>
-                </xsl:for-each>
-            </xsl:otherwise>
-        </xsl:choose>
-    </xsl:for-each>
+        if( skip_<xsl:value-of select="$type"/>() ) return
+        call <xsl:call-template name="name-mangler"/>( a,b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
+    end subroutine <xsl:value-of select="$subroutinemangled"/>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:for-each>
     
         </xsl:for-each>
     </xsl:template>
@@ -1044,8 +1050,11 @@ end module error_handling_unittest<xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         
         ! Local variables
-        character(:)<xsl:call-template name="deferred-rank-specification-equal"/>
-        <xsl:text/>, allocatable :: a_str, b_str, e_str<xsl:text/>
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+        character(MAX_CHARACTER_LEN)<xsl:call-template name="deferred-rank-specification-equal"/>, allocatable :: a_str, b_str, e_str
+#else
+        character(:)<xsl:call-template name="deferred-rank-specification-equal"/>, allocatable :: a_str, b_str, e_str
+#endif
         character(len=40) :: lfmt
         integer :: lfmt_width, stat
         <xsl:call-template name="real-type"/><xsl:call-template name="rank-specification-equal"/> :: e<xsl:text/>
@@ -1057,20 +1066,32 @@ end module error_handling_unittest<xsl:text/>
         <xsl:call-template name="assert-array-shape"/>
         e = <xsl:value-of select="$error_f"/>(a,b)
         if( <xsl:if test="$rank &gt; 0">all( </xsl:if>e &lt;= <xsl:value-of select="$err_tol"/><xsl:if test="$rank &gt; 0"> )</xsl:if> ) then
-            call assertion_succeeded()
+            ! NOP
         else<xsl:text/>
             ! Export the data as character string<xsl:text/>
             lfmt = "(<xsl:call-template name="type-format-w-optional"/>)"
             lfmt_width = fmt_width( lfmt )
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+            allocate(a_str<xsl:call-template name="shape-specification-equal"/>,stat=stat)
+#else
             allocate(a_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width),stat=stat)
+#endif
             if( stat /= 0 ) print *, "*** Internal error: could not allocate ", &#38;
                 "a_str<xsl:call-template name="shape-specification-equal-val"/>, lfmt_width=", &#38;
                 lfmt_width, " (<xsl:call-template name="name-mangler"/>)"
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+            allocate(b_str<xsl:call-template name="shape-specification-equal"/>,stat=stat)
+#else
             allocate(b_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width),stat=stat)
+#endif
             if( stat /= 0 ) print *, "*** Internal error: could not allocate ", &#38;
                 "b_str<xsl:call-template name="shape-specification-equal-val"/>, lfmt_width=", &#38;
                 lfmt_width, " (<xsl:call-template name="name-mangler"/>)"
+#ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
+            allocate(e_str<xsl:call-template name="shape-specification-equal"/>,stat=stat)
+#else
             allocate(e_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width),stat=stat)
+#endif
             if( stat /= 0 ) print *, "*** Internal error: could not allocate ", &#38;
                 "e_str<xsl:call-template name="shape-specification-equal-val"/>, lfmt_width=", &#38;
                 lfmt_width, " (<xsl:call-template name="name-mangler"/>)"
@@ -1122,7 +1143,6 @@ end module error_handling_unittest<xsl:text/>
             else
                 call create_error( ifail, info )
             end if
-            call assertion_failed()
         end if
     end subroutine <xsl:call-template name="name-mangler"/>
 	
@@ -1132,7 +1152,6 @@ end module error_handling_unittest<xsl:text/>
         <xsl:for-each select="exsl:node-set($cursor)">
 			<xsl:variable name="mangled"><xsl:call-template name="name-mangler"/></xsl:variable>
 			<xsl:variable name="subroutinemangled"><xsl:value-of select="$type"/>_<xsl:value-of select="str:replace($mangled,'assert_','')"/></xsl:variable>
-			  
 			<xsl:choose>
 				<xsl:when test="$type = 'unittest'">
     subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
@@ -1143,17 +1162,16 @@ end module error_handling_unittest<xsl:text/>
         if( skip_<xsl:value-of select="$type"/>() ) return
         associate( ifail=>local_ifail )
             call <xsl:call-template name="name-mangler"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
-            call handle_unittest( ifail )
         end associate
-    end subroutine <xsl:value-of select="$subroutinemangled"/>		
+        call handle_unittest( local_ifail, ifail )
+    end subroutine <xsl:value-of select="$subroutinemangled"/>
 				</xsl:when>
 				<xsl:otherwise>
     subroutine <xsl:value-of select="$subroutinemangled"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b
         <xsl:call-template name="real-type"/>, intent(in) :: <xsl:value-of select="$err_tol"/><xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
-	    
-           if( skip_<xsl:value-of select="$type"/>() ) return
+        if( skip_<xsl:value-of select="$type"/>() ) return
         call <xsl:call-template name="name-mangler"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
     end subroutine <xsl:value-of select="$subroutinemangled"/>
 				</xsl:otherwise>
@@ -1172,7 +1190,7 @@ end module error_handling_unittest<xsl:text/>
     function <xsl:call-template name="name-mangler"/>( a,b ) result( rel_err )
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification-equal"/>, intent(in) :: b
-        <xsl:value-of select="@type"/><xsl:call-template name="rank-specification-equal"/> :: rel_err<xsl:text/>
+        <xsl:call-template name="real-type"/><xsl:call-template name="rank-specification-equal"/> :: rel_err<xsl:text/>
         <xsl:choose>
             <xsl:when test="@rank = 0">
         if( a/=b ) then
