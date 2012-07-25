@@ -11,7 +11,12 @@
 # NAG Fortran Compiler Release 5.3(856)
 FFLAGS_nagfor_beta=-f2003 -colour -v -fpp
 FFLAGS_nagfor_beta+=-O0 -C=all -g90
-# FFLAGS_nagfor_beta+=-w=uda # Avoid warnings over unused ifail output arguments
+
+# <temp>
+FFLAGS_nagfor_beta+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
+FFLAGS_nagfor_beta+=-DFC_NO_ALLOCATABLE_DTCOMP
+FFLAGS_nagfor_beta+=-DFC_NO_DT_CONSTRUCTOR
+# </temp>
 
 # For verifying the FC_.* options
 alt:
@@ -42,13 +47,15 @@ FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXE
 ###############################################################################
 # ifort_beta (IFORT) 12.1.0 20111011 - partially
 # ifort_beta (IFORT) 12.1.2 20111128 - problem with derived type constructors
-# ifort_beta (IFORT) 12.1.5 20120612
+# ifort_beta (IFORT) 12.1.5 20120612 - requires "-standard-semantics" for assignments to allocatable arrays
 FFLAGS_ifort_beta=-std03 -check -warn -fpp
+FFLAGS_ifort_beta+=-standard-semantics
 FFLAGS_ifort_beta+=-O0 -g
 FFLAGS_ifort_beta+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
 FFLAGS_ifort_beta+=-DFC_NO_ALLOCATABLE_DTCOMP
 FFLAGS_ifort_beta+=-DFC_NO_DT_CONSTRUCTOR
 
+# Must be last of the flags, so use FFLAGS_ifort_beta:= ... $(FFLAGS_ifort_beta) to add more options
 FFLAGS_ifort_beta+=-free -Tf
 
 ###############################################################################

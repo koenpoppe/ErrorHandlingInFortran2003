@@ -70,24 +70,8 @@ contains
         type(allocation_error) :: info
         
         info%error_code = error_code
-        if( allocated(allocation_error_requested_lower)) &
-            deallocate(allocation_error_requested_lower)
-        if( allocated(allocation_error_requested_upper)) &
-            deallocate(allocation_error_requested_upper)
-        !   20120724 KP - Assignment to allocatable variable is broken in ifort_beta (IFORT) 12.1.5 20120612 ...
-        !         allocation_error_requested_lower = requested_lower ! F2003
-        !         allocation_error_requested_upper = requested_upper ! F2003
-        if( .not. allocated(allocation_error_requested_lower) ) then
-            print *, "BUG: allocatable assignment allocation_error_requested_lower did not succeed!"
-            allocate( allocation_error_requested_lower(size(requested_lower)) )
-            allocation_error_requested_lower(:) =  requested_lower
-        end if
-        if( .not. allocated(allocation_error_requested_upper) ) then
-            print *, "BUG: allocatable assignment allocation_error_requested_upper did not succeed!"
-            allocate( allocation_error_requested_upper(size(requested_upper)) )
-            allocation_error_requested_upper(:) = requested_upper
-        end if
-        
+        allocation_error_requested_lower = requested_lower ! F2003
+        allocation_error_requested_upper = requested_upper ! F2003
     end function allocation_error_constructor
 #endif
     

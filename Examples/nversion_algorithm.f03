@@ -153,14 +153,12 @@ contains
         ! Enforce a fixed memory bound
         if( workspace_size > workspace_bound ) then
 #ifdef ERROR_HANDLING
-            call foo(info)
 #ifdef FC_NO_DT_CONSTRUCTOR
             info = allocation_error_constructor( &
 #else
             info = allocation_error( &
 #endif
                     workspace_bound, (/ 1 /), (/ workspace_size /) )
-            call foo(info)
             call create_error(ifail, info, &
                 "nversion_algorithm:allocate_workspace:enforced" )
 #else
@@ -172,14 +170,12 @@ contains
         ! Verify unreasonable sizes
         if( workspace_size < 0) then
 #ifdef ERROR_HANDLING
-            call foo(info)
 #ifdef FC_NO_DT_CONSTRUCTOR
             info = allocation_error_constructor( &
 #else
             info = allocation_error( &
 #endif
                     -1, (/ 1 /), (/ workspace_size /) )
-            call foo(info)
             call create_error(ifail, info, &
                 "nversion_algorithm:allocate_workspace:negative" )
 #else
@@ -192,14 +188,12 @@ contains
         allocate( workspace(workspace_size), stat=stat )
         if( stat /= 0 ) then
 #ifdef ERROR_HANDLING
-            call foo(info)
 #ifdef FC_NO_DT_CONSTRUCTOR
             info = allocation_error_constructor( &
 #else
             info = allocation_error( &
 #endif
                 stat, (/ 1 /), (/ workspace_size /) )
-            call foo(info)
             call create_error(ifail, info, &
                 "nversion_algorithm:allocate_workspace" )
 #else
@@ -215,20 +209,6 @@ contains
 #endif
         
     end subroutine allocate_workspace
-    
-    subroutine foo( info )
-        type(allocation_error), intent(in) :: info
-!         print *, "-------------"
-!         print *, "- error_code = ", info%error_code
-! #ifdef FC_NO_DT_CONSTRUCTOR
-!         print *, "* lower: ", allocated(allocation_error_requested_lower)
-!         print *, "* upper: ", allocated(allocation_error_requested_upper)
-! #else
-!         print *, "- lower: ", allocated(info%requested_lower)
-!         print *, "- upper: ", allocated(info%requested_upper)
-! #endif
-!         print *, "-------------"
-    end subroutine foo
     
 #ifndef ERROR_HANDLING
     subroutine print_error( inform )

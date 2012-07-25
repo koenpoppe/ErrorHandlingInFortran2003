@@ -36,7 +36,7 @@ program unittest_test_driver
     call relerr_vector()
     call relerr_matrix()
     
-    call unittest_report()
+!     call unittest_report() ! Report makes no sense, test are supposed to fail ...
     
     close(unit=unit)
 

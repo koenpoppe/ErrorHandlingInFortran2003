@@ -3,9 +3,9 @@ first: one
 ###############################################################################
 # Fortran compiler
 
-# FC=nagfor_beta
+FC=nagfor_beta
 # FC=gfortran_beta
-FC=ifort_beta
+# FC=ifort_beta
 
 FPP=$(FC)
 
@@ -42,7 +42,7 @@ clean:
 ###############################################################################
 # The available examples and the selected one
 EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test
-EXAMPLE=nversion_algorithm
+EXAMPLE=unittest_test
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))
@@ -137,6 +137,7 @@ alllogs:
 	$(MAKE) allversions_safe ALLTARGET=store
 allfull:
 	$(MAKE) allversions_safe ALLTARGET=full
+    
 allclean:
 	$(MAKE) veryclean VERSION=old
 	$(MAKE) veryclean VERSION=new
