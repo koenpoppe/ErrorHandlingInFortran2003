@@ -50,6 +50,13 @@ module error_handling_common_errors
         procedure :: write_to => enum_descriptions_write_to
     end type enumeration_error
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
+#ifdef FC_NO_DT_CONSTRUCTOR
+    public :: enumeration_error_constructor
+#else
+    interface enumeration_error
+        module procedure enumeration_error_constructor
+    end interface enumeration_error
+#endif
     integer, dimension(:), allocatable, private :: enumeration_error_enums
     character(len=40), dimension(:), allocatable, private :: enumeration_error_enum_descriptions
 #ifdef FC_FIXED_LENGTH_CHARACTERSTRINGS
@@ -136,6 +143,22 @@ contains
         
     end subroutine iostat_error_write_to
 
+#ifdef FC_NO_ALLOCATABLE_DTCOMP
+    function enumeration_error_constructor( enum, enums, enum_descriptions, message ) result( info )
+        type(enumeration_error) :: info
+        integer, intent(in) :: enum
+        integer, dimension(:), intent(in) :: enums
+        character(len=*), dimension(:), intent(in) :: enum_descriptions
+        character(len=*), intent(in) :: message
+        
+        info%enum = enum
+        enumeration_error_enums = enums ! F2003 assignment
+        enumeration_error_enum_descriptions = enum_descriptions ! F2003 assignment
+        enumeration_error_message = message         
+    end function enumeration_error_constructor
+#endif
+
+
     subroutine enum_descriptions_write_to( info, unit, prefix, suffix )
         class(enumeration_error), intent(in) :: info
         integer, intent(in) :: unit
@@ -144,29 +167,28 @@ contains
         integer :: i
         logical :: show_default_message
         character(len=20) :: fmt
-        character(:), allocatable :: message
         
+        write(unit=unit,fmt="(2A,I0,2A)",advance="no") prefix, "Unexpected enumeration value ", info%enum, ", "
+        show_default_message = .true.
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
-        associate( enum=>info%enum, enums=>enumeration_error_enums, &
-                 descriptions=>enumeration_error_enum_descriptions )
+        associate( enums=>enumeration_error_enums, descriptions=>enumeration_error_enum_descriptions )
             if( allocated(enumeration_error_message) ) then
-                message = enumeration_error_message
+                if( len_trim(enumeration_error_message) > 0 ) then
+                    write(unit=unit,fmt="(A)",advance="no") trim(enumeration_error_message)
+                    show_default_message = .false.
+                end if
             end if
 #else
-        associate( enum=>info%enum, enums=>info%enums, descriptions=>info%enum_descriptions )
+        associate( enums=>info%enums, descriptions=>info%enum_descriptions )
             if( allocated(info%message) ) then
-                message = info%message
+                if( len_trim(info%message) > 0 ) then
+                    write(unit=unit,fmt="(A)",advance="no") trim(info%message)
+                    show_default_message = .false.
+                end if
             end if
 #endif
-            write(unit=unit,fmt="(2A,I0,2A)",advance="no") prefix, "Unexpected enumeration value ", enum, ", "
-            show_default_message = .true.
-            if( allocated(message) ) then
-                show_default_message = len_trim(message) > 0
-            end if
             if( show_default_message ) then
                 write(unit=unit,fmt="(A)",advance="no") "expecting one of the following"
-            else
-                write(unit=unit,fmt="(A)",advance="no") trim(message)
             end if
             write(unit=unit,fmt="(2A)") ": ", suffix
             write(unit=fmt,fmt="(A,I0,A,I0,A)") "(2A,A", maxval(len_trim(descriptions)), & 

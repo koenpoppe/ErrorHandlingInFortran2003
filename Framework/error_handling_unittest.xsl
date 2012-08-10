@@ -371,9 +371,12 @@ contains<xsl:text/>
         else if( nb_diff == nb ) then
             write(unit=unit,fmt="(2A,I0,2A)") prefix, &amp;
                 "All the ", nb, " elements differ: ", suffix
-        else
+        else if( nb_diff == 1 ) then
             write(unit=unit,fmt="(A,I0,A,I0,2A)") prefix, &amp;
                 nb_diff, " of the ", nb, " elements differs: ", suffix
+        else
+            write(unit=unit,fmt="(A,I0,A,I0,2A)") prefix, &amp;
+                nb_diff, " of the ", nb, " elements differ: ", suffix
         end if
         
     end subroutine report_header_nb_differences
