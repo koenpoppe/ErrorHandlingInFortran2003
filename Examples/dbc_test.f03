@@ -18,9 +18,15 @@ program dbc_test
     use error_handling
     implicit none
 
+    ! Header
+    call unittest_reset("dbc_test")
+
+    ! Main tests
     call factorial_test()
     call vector_relerr_test()
     
+    ! Footer
+    call unittest_report()
 
 contains
     

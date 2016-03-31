@@ -19,9 +19,6 @@ program unittest_test_driver
     
     integer, parameter :: unit = 16635
         
-    open(unit=unit,file="unittest_test_driver.txt",action="write",status="unknown")
-!     call set_report_error_unit( unit )
-    
     call unittest_reset( "unittest_test_driver" )
     
 !     call primitive()
@@ -36,8 +33,6 @@ program unittest_test_driver
     call relerr_vector()
     call relerr_matrix()
     
-!     call unittest_report() ! Report makes no sense, test are supposed to fail ...
+    ! unittest_report() here makes no sense, test are supposed to fail ...
     
-    close(unit=unit)
-
 end program
