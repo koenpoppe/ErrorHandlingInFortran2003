@@ -1,4 +1,4 @@
-first: one
+first: all
 
 ###############################################################################
 # Fortran compiler
@@ -44,7 +44,7 @@ clean:
 
 ###############################################################################
 # The available examples and the selected one
-EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test
+EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve unittest_test common_wrappers
 EXAMPLE=unittest_test
 
 # The corresponding drivers
@@ -122,7 +122,7 @@ doc: $(SOURCE_LIST)
 veryclean: clean cleandrivers cleanpreprocs cleanlogs cleanothers
 
 # Collectives
-ALLTARGET=one
+ALLTARGET=run
 all:
 	$(foreach EX,$(EXAMPLES), $(MAKE) $(ALLTARGET) VERSION=$(VERSION) EXAMPLE=$(EX) ; )
 allversions_safe:
