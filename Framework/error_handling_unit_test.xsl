@@ -23,7 +23,7 @@
 	<xsl:variable name="ASSERT_OPTIONS_TYPEDECLARATION">
         <xsl:text/>character(:), allocatable :: a_name,b_name,extra_name
         logical :: show_difference_marks = .false.
-	</xsl:variable>
+    </xsl:variable>
 	<xsl:template name="assert-options-typeassignment">
 		<xsl:param name="condition"/>
 		<xsl:param name="condition-str"/>
@@ -821,13 +821,13 @@ end module error_handling_unit_test<xsl:text/>
         ! Local variables
         character(:)<xsl:call-template name="deferred-rank-specification-equal"/>
         <xsl:text/>, allocatable :: a_str, b_str, e_str<xsl:text/>
-		character(len=40) :: lfmt
+        character(len=40) :: lfmt
         integer :: lfmt_width
         <xsl:call-template name="real-type"/><xsl:call-template name="rank-specification-equal"/> :: e<xsl:text/>
         character(len=40) :: <xsl:value-of select="$err_tol"/>_str
-		<xsl:if test="$rank &gt; 0"><xsl:text/>
+        <xsl:if test="$rank &gt; 0"><xsl:text/>
         integer :: <xsl:value-of select="$is"/>
-		</xsl:if>
+    </xsl:if>
         type(unit_test_error_rank<xsl:value-of select="$rank"/>) :: info
         <xsl:call-template name="assert-array-shape"/>
         e = <xsl:value-of select="$error_f"/>(a,b)
@@ -840,7 +840,7 @@ end module error_handling_unit_test<xsl:text/>
             allocate(a_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width))
             allocate(b_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width))
             allocate(e_str<xsl:call-template name="shape-specification-equal"/>,source=repeat(" ",lfmt_width))
-			<xsl:choose>
+            <xsl:choose>
 				<xsl:when test="$rank = 0">
             write(unit=a_str,fmt=lfmt) a
             write(unit=b_str,fmt=lfmt) b<xsl:text/>
@@ -858,8 +858,8 @@ end module error_handling_unit_test<xsl:text/>
 					</xsl:for-each>
 				</xsl:otherwise>
 			</xsl:choose>
-			
-			write(unit=<xsl:value-of select="$err_tol"/>_str,fmt="(ES7.1)") <xsl:value-of select="$err_tol"/>
+            
+            write(unit=<xsl:value-of select="$err_tol"/>_str,fmt="(ES7.1)") <xsl:value-of select="$err_tol"/>
 			<xsl:call-template name="assert-options-typeassignment">
                 <xsl:with-param name="condition">e &lt;= <xsl:value-of select="$err_tol"/></xsl:with-param>
                 <xsl:with-param name="condition-str">
