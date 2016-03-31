@@ -96,7 +96,8 @@
 	<!-- - - - - - - - - - - TEMPLATES - - - - - - - - - - -->
 	
 	<xsl:template name="interfaces">
-		<xsl:for-each select="*">
+		<xsl:param name="cursor" select="."/>
+		<xsl:for-each select="exsl:node-set($cursor)/*">
         <xsl:if test="name(preceding-sibling::*) != name(.)">
 <xsl:text/>    public :: <xsl:value-of select="name(.)"/></xsl:if>
     interface <xsl:value-of select="name(.)"/>

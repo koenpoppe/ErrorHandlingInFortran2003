@@ -23,17 +23,18 @@ module error_handling_common_errors
         integer :: error_code
 #ifndef FC_NO_ALLOCATABLE_DTCOMP
         integer, dimension(:), allocatable :: requested_shape
-#else
-!         integer, private :: requested_rank
-!         integer, dimension(7) :: requested_shape
 #endif
     contains
         procedure :: info_message => allocation_error_info_message
     end type allocation_error
 #ifdef FC_NO_ALLOCATABLE_DTCOMP
+#ifdef FC_NO_DT_CONSTRUCTOR
+	public :: allocation_error_constructor
+#else
     interface allocation_error
         module procedure allocation_error_constructor
     end interface allocation_error
+#endif
     integer, dimension(:), private, allocatable :: allocation_error_requested_shape
 #endif
     

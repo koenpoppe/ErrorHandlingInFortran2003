@@ -1,6 +1,13 @@
 FC=gfortran_beta
 
 ###############################################################################
+# As compilers continue to implement Fortran 2003 features, the following 
+# macro's are available:
+# - FC_NO_SAME_TYPE_AS_SUPPORT, disables same_type_as primitive
+# - FC_NO_FINAL_SUPPORT, disables finalisation
+# - FC_NO_ALLOCATABLE_DTCOMP, disables allocatable components of a derived type
+
+###############################################################################
 # nagfor_beta = NAG Fortran Compiler Release 5.3(842)
 #    - Works!
 FFLAGS_nagfor_beta=-f2003 -colour -v -fpp
@@ -31,10 +38,16 @@ FFLAGS_gfortran=$(FFLAGS_gfortran_beta) -DFC_NO_SAME_TYPE_AS_SUPPORT
 FFLAGS_g95=-std=f2003 -fmod=$(LIBDIR) -DFC_NO_FINAL_SUPPORT
 
 ###############################################################################
-# ifort = ifort_beta (IFORT) 12.1.0 20111011
+# ifort_beta (IFORT) 12.1.0 20111011
 #    - /tmp/ifort_betaewX8Q5.i: catastrophic error: **Internal compiler error: segmentation violation signal raised** Please report this error along with the circumstances in which it occurred in a Software Problem Report.  Note: File and line given may not be explicit cause of this error. compilation aborted for error_handling_unit_test.f03 (code 1)
-
+# ifort_beta (IFORT) 12.1.2 20111128
+#    ifort_beta -c -module ifort_beta_build/ -fpp -g -check -warn  -DFC_NO_ALLOCATABLE_DTCOMP -free -Tf error_handling_common_wrappers.f03
+#    error_handling_common_wrappers.f03(59): error #6593: The number of expressions in a structure constructor differs from the number of components of the derived type   [ALLOCATION_ERROR]
+#                   allocation_error( stat, (/ sizes /) ) )
+#    ---------------^
+#    ompilation aborted for error_handling_common_wrappers.f03 (code 1)
 FFLAGS_ifort_beta= -module $(LIBDIR) -fpp -g -check -warn 
+FFLAGS_ifort_beta+=-DFC_NO_ALLOCATABLE_DTCOMP -DFC_NO_DT_CONSTRUCTOR
 FFLAGS_ifort_beta+=-free -Tf
 
 # ifort = ifort (IFORT) 12.0.2 20110112

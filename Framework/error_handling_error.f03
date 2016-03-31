@@ -395,14 +395,13 @@ contains
             nullify( inform%info )
         end if
 
-#ifndef FC_NO_FINAL_SUPPORT
+#ifndef FC_NO_ALLOCATABLE_DTCOMP
         if( allocated(inform%method) ) then
             ifail%method = inform%method
         end if
 #else
         ifail%method = inform%method
 #endif
-        
         if( associated(inform%reason) ) then
             allocate( ifail%reason )
             call transfer_error( inform%reason, ifail%reason )

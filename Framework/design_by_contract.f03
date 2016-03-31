@@ -6,6 +6,7 @@
 ! 
 !   20101021 KP - Rewritten version
 !   20101110 KP - Added Postconditions, ...
+!   20120123 KP - DBC errors are no longer 'cachable'
 ! 
 ! AUTHOR
 ! 
@@ -22,75 +23,75 @@ module design_by_contract
     save
     
     !--------------------------------------------------------------------------
-    ! Derived types
+    ! What to check
+    !--------------------------------------------------------------------------
+    
+    logical :: check_precondition = .true.
+    logical :: check_postcondition = .true.
+    logical :: check_check = .true.
+    
+    public :: skip_precondition
+    public :: skip_postcondition
+    public :: skip_check
+    
+    !--------------------------------------------------------------------------
+    ! Settings
+    !--------------------------------------------------------------------------
+    
+    public :: dbc_setup
+    
+contains
+    
+    !--------------------------------------------------------------------------
+    ! What to check
     !--------------------------------------------------------------------------
 
-!     ! 1. General Design by Contract error
-!     type, extends(message_error), public :: dbc_error
-!         character(:), allocatable :: statement, comment, filename
-!         integer :: line = -1
-!     contains
-!         procedure :: info_message => error_info_message_dbc_error
-!     end type dbc_error
+    function skip_precondition() result(skip)
+          logical :: skip
+          skip = .not. check_precondition
+    end function skip_precondition
     
-!     ! 2. Precondition
-!     type, extends(dbc_error) :: precondition_error
-!     end type precondition_error
-!     public :: precondition_fails
-!     interface precondition_fails
-!         module procedure precondition_full
-!     end interface precondition_fails
-!     
-!     ! 3. Postcondition
-!     type, extends(dbc_error) :: postcondition_error
-!     end type postcondition_error
-!     public :: postcondition_fails
-!     interface postcondition_fails
-!         module procedure postcondition_full
-!     end interface postcondition_fails
+    function skip_postcondition() result(skip)
+          logical :: skip
+          skip = .not. check_postcondition
+    end function skip_postcondition
     
-! contains
+    function skip_check() result(skip)
+          logical :: skip
+          skip = .not. check_check
+    end function skip_check
 
-!     function precondition_full( ifail, condition, message ) result( failed )
-!         type(error), intent(out), optional :: ifail
-!         logical, intent(in) :: condition
-!         character(len=*), intent(in) :: message
-!         logical :: failed
-!         failed = .not. condition
-!         if( failed ) then
-!             call create_error( ifail, precondition_error(message) )
-!         end if
-!     end function precondition_full
-! 
-!     function postcondition_full( ifail, condition, message ) result( failed )
-!         type(error), intent(out), optional :: ifail
-!         logical, intent(in) :: condition
-!         character(len=*), intent(in) :: message
-!         logical :: failed
-!         failed = .not. condition
-!         if( failed ) then
-!             call create_error(ifail, postcondition_error(message))
-!         end if
-!     end function postcondition_full
-! 
-!     subroutine error_info_message_dbc_error( info, unit, prefix, suffix )
-!         class(dbc_error), intent(in) :: info
-!         integer, intent(in) :: unit
-!         character(len=*), intent(in) :: prefix, suffix
-! 
-!         character(len=12) :: condition
-!         
-!         select type(info)
-!             type is(precondition_error)
-!                 condition = "Precondition"
-!             type is(postcondition_error)
-!                 condition = "Postcondition"
-!             class default
-!                 condition = "General DBC"
-!         end select
-!         
-!         write(unit=unit,fmt="(5A)") prefix, condition, " violation: ", info%message, suffix
-!         
-!     end subroutine error_info_message_dbc_error
+    !--------------------------------------------------------------------------
+    ! Settings
+    !--------------------------------------------------------------------------
+    
+    ! Change the verification of all types of design-by-contract checks
+    !    call dbc_setup( all=.true. )
+    !    call dbc_setup( all=.false. )
+    ! 
+    ! Change specific checks
+    !    call dbc_setup( precondition=.true. )
+    !    call dbc_setup( precondition=.false. )
+    subroutine dbc_setup( precondition, postcondition, check, all )
+        logical, intent(in) :: precondition, postcondition, check, all
+        
+        check_precondition  = optional_logical( precondition,  optional_logical( all, check_precondition  ) )
+        check_postcondition = optional_logical( postcondition, optional_logical( all, check_postcondition ) )
+        check_check         = optional_logical( check,         optional_logical( all, check_check         ) )
+        
+    end subroutine dbc_setup
+    
+    function optional_logical( opt, default )
+        logical, intent(in), optional :: opt
+        logical, intent(in) :: default
+        logical :: optional_logical
+        
+        if( present(opt) ) then
+            optional_logical = opt
+        else
+            optional_logical = default
+        end if
+        
+    end function optional_logical
 
 end module design_by_contract
