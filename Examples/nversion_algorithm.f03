@@ -66,7 +66,7 @@ contains
             return
         end if
 #ifdef ERROR_HANDLING
-        call soft_silent_error( inform ) ! Discard, we'll try something else
+        call discard_error( inform ) ! Discard, we'll try something else
 #endif
         
         ! Try version 2
@@ -85,7 +85,7 @@ contains
             return
         end if
 #ifdef ERROR_HANDLING
-        call soft_silent_error( inform ) ! Discard, we'll try something else
+        call discard_error( inform ) ! Discard, we'll try something else
 #endif
 
         ! Try version 3, which is only valid for N even
@@ -93,7 +93,7 @@ contains
 #ifdef ERROR_HANDLING
             call create_error(inform, message_error( & 
                 "Version 3 is only valid for even values of N"), &
-                "nversion_algorithm:my_nversion_algorithm" )
+                "nversion_algorithm:my_nversion_algorithm"  )
 #else
             inform = -1 ! soft noisy error
             call handle_error( 3001, inform )
