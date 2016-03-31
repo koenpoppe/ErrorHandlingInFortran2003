@@ -30,7 +30,10 @@ QUICK START GUIDE
 
 To start working with the error handling package
 
-1. compile the package as described in Appendix~\ref{sec:feh:install},
+1. compile the framework
+   >> cd Framework
+   >> make
+   The resulting module files and library is stored in "<your_compiler>_build"
 
 2. import the framework in your code by adding the
 
