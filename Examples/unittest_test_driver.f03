@@ -21,8 +21,8 @@ program unittest_test_driver
         
     call unittest_reset( "unittest_test_driver" )
     
-!     call primitive()
-!     call scalar()
+    call primitive()
+    call scalar()
     
     call short_vector()
     call large_vector()
