@@ -25,6 +25,9 @@ program dbc_test
     call factorial_test()
     call vector_relerr_test()
     
+    ! Specific bug tests
+    call gfortran_20120809_segfault()
+
     ! Footer
     call unittest_report()
 
@@ -100,4 +103,21 @@ contains
         call report_error( inform )
     end subroutine vector_relerr_test
 
+    !--------------------------------------------------------------------------
+    ! Specific bug tests
+    !--------------------------------------------------------------------------
+    
+    subroutine gfortran_20120809_segfault()
+        call gfortran_20120809_segfault_sub( .true. )    
+    end subroutine gfortran_20120809_segfault
+
+    subroutine gfortran_20120809_segfault_sub( success, ifail_not_present )
+        logical, intent(in) :: success
+        type(error), intent(out), optional :: ifail_not_present
+        print *, "Asserting"
+        call assert( success, ifail=ifail_not_present ); 
+        print *, "Is error?"
+        print *, is_error(ifail_not_present)
+    end subroutine gfortran_20120809_segfault_sub
+    
 end program dbc_test
