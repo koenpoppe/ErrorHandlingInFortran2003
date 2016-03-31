@@ -40,9 +40,16 @@ FFLAGS_nagfor_beta+=$(FFLAGS_nagfor_beta_alt$(ALT))
 #      f951: internal compiler error: in gfc_get_derived_type, at fortran/trans-types.c:2394
 # GNU Fortran (GCC) 4.8.0 20120722 (experimental)
 
-FFLAGS_gfortran_beta=-std=f2003 -Wall -cpp
-FFLAGS_gfortran_beta+=-O0 -g
+FFLAGS_gfortran_beta=-std=f2003 -Wall -cpp -ffree-line-length-none -pedantic -Wimplicit-interface -Wunderflow -fbounds-check -fimplicit-none
+FFLAGS_gfortran_beta+=-O0 -g -fbacktrace
 FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
+
+###############################################################################
+# GNU Fortran (GCC) 5.2.0 2015
+
+FFLAGS_gfortran=-std=f2003 -Wall -cpp -ffree-line-length-none -pedantic -Wimplicit-interface -Wunderflow -fbounds-check -fimplicit-none
+FFLAGS_gfortran+=-O0 -g -fbacktrace
+FFLAGS_gfortran+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
 
 ###############################################################################
 # ifort_beta (IFORT) 12.1.0 20111011 - partially

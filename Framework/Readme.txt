@@ -13,6 +13,7 @@ This package requires both
 The software has been succesfully tested with
 - NAG Fortran Compiler Release 5.3(856) and
 - GNU Fortran (GCC) 4.7.0 20111129 (experimental).
+- GNU Fortran (GCC) 5.2.0 2015
 
 For these compilers, compiler flags are included in the Makefile and compilation is as simple as running `make`. This will, amongst others, determine which kinds of integers, real and complex values are supported and preproces the package so its functionality can be used for each of them.
 

@@ -1,5 +1,6 @@
-FC=nagfor_beta
+# FC=nagfor_beta
 # FC=gfortran_beta
+FC=gfortran
 # FC=ifort_beta
 
 first: library
@@ -36,6 +37,7 @@ include makefile.inc
 FFLAGS_nagfor_beta+=-mdir $(LIBDIR) -I $(LIBDIR)
 FFLAGS_gfortran_beta+=-J $(LIBDIR)
 FFLAGS_ifort_beta:= -module $(LIBDIR) $(FFLAGS_ifort_beta)
+FFLAGS_gfortran+=-J $(LIBDIR)
 
 FFLAGS=$(FFLAGS_$(FC))
 %.o: %.f03

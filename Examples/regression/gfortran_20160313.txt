@@ -1,0 +1,357 @@
+GNU Fortran (GCC) 5.2.0
+Copyright © 2015 Free Software Foundation, Inc.
+
+GNU Fortran comes with NO WARRANTY, to the extent permitted by law.
+You may redistribute copies of GNU Fortran
+under the terms of the GNU General Public License.
+For more information about these matters, see the file named COPYING
+
+zo 13 mrt 2016 17:20:36 CET
+
+=== username_selection_driver_new ====================================
+=> register_username( '' )
+*** Error:
+       Run-time check: len_trim(username) > b (username must not be empty)
+       len_trim(username) = 0
+                        b = 0
+
+=> register_username( 'Koen' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen' is invalid because it must contain one or more digits. Proposed alternative: 'Koen1'.
+
+=> register_username( 'Koen 123' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen 123' is invalid because it must not contain spaces. Proposed alternative: 'Koen123'.
+
+=> register_username( 'Koen.123' )
+OK.
+
+-- Altering the future: the username will be existing --
+=> register_username( 'Koen.123' )
+*** Error from 'username_selection:register_username':
+       User name 'Koen.123' is invalid because it is already used. Proposed alternative: 'Koen.123_1'.
+
+-- Altering the future: the connection to the server will fail --
+=> register_username( 'Koen.123' )
+*** Error from 'username_selection:register_username':
+       Could not verify the username
+ ** cascading:
+       Connection to server could not be established
+
+
+
+=== nversion_algorithm_driver_new ====================================
+
+=> my_nversion_algorithm(       100 )
+Performing my_nversion_algorithm version 1.
+
+=> my_nversion_algorithm(      1000 )
+Performing my_nversion_algorithm version 2.
+
+=> my_nversion_algorithm(   1000000 )
+Performing my_nversion_algorithm version 3.
+
+=> my_nversion_algorithm(   1000001 )
+*** Error from 'nversion_algorithm:my_nversion_algorithm':
+       Failed to perform any of the versions of the algorithm
+ ** cascading from 'nversion_algorithm:my_nversion_algorithm':
+       Version 3 is only valid for even values of N
+
+=> my_nversion_algorithm(   1000002 )
+*** Error from 'nversion_algorithm:my_nversion_algorithm':
+       Failed to perform any of the versions of the algorithm
+ ** cascading from 'nversion_algorithm:allocate_workspace:enforced':
+       Allocating array(1:1000002) did not work (error code 1000000).
+
+=== fragile_input_driver_new ====================================
+Invalid integer try again... (4 attempts left)
+ => Number =          111
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Error from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 5010.
+
+Invalid integer try again... (4 attempts left)
+Invalid integer try again... (3 attempts left)
+Invalid integer try again... (2 attempts left)
+Invalid integer try again... (1 attempt left)
+*** Error from 'fragile_input:fragile_integer_input':
+       Failed reading a valid integer within 5 attempts
+ ** cascading from 'fragile_input:integer_input':
+       Processor dependent code 5001.
+
+
+=== lin_solve_driver_new ====================================
+1st call to solve
+Solution returned in x:
+   0.100E+01  0.500E+00  0.333E+00
+
+2nd call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is ill conditioned: 1/cond(diag)= 7.401E-18
+
+3th call to solve
+No solution returned in x because
+*** Error:
+       The matrix diag is exactly singular
+
+4th call to solve
+No solution returned in x because
+*** Error:
+       Argument trans='s' is invalid. The value must be one of the following: NnTtCc
+
+
+=== unittest_test_driver_new ====================================
+ 
+*** Error:
+       [unittest_test_driver] Test 2: a .eqv. b (primitive, must fail)
+       a = F
+       b = T
+           ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 4: a .eqv. b (logical, different, must fail)
+       a = T
+       b = F
+           ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 6: a == b (integer, different, must fail)
+       a = 1
+       b = 2
+           ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 7: a == b (character(len=1), must fail)
+       a = a
+       b = b
+           ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 8: a == b (character(len>1), must fail)
+       a = abcbcan
+       b = bbcbacn
+           ^---^^-
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 10: shape(a) == shape(b) (short_vector, different length, must fai)
+       shape(a) = 3
+       shape(b) = 4
+                  ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 12: a == b (short_vector, show all, must fail)
+       2 of the 3 elements differ: 
+       a = 1 | 2 | 3
+       b = 3 | 2 | 1
+           ^       ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 14: a == b (large_vector, compress middle, must fail)
+       3 of the 13 elements differ: 
+       idx = 1 | 2 | . | 13
+         a = 1 | 2 | . |  3
+         b = 3 | 1 | . |  2
+             ^   ^   .    ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 15: a == b (large_vector, compress middle, must fail)
+       5 of the 13 elements differ: 
+       idx = 1 | . | 3 | . | 5 | . | 9 | . | 13
+         a = 1 | . | 9 | . | 9 | . | 9 | . |  3
+         b = 3 | . | 8 | . | 7 | . | 3 | . |  2
+             ^   .   ^   .   ^   .   ^   .    ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 16: a == b (large_vector, compress leading, must fai)
+       1 of the 13 elements differs: 
+       idx = . | 13
+         a = . |  3
+         b = . |  4
+             .    ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 17: a == b (large_vector, compress trailing, must fa)
+       1 of the 13 elements differs: 
+       idx = 1 | .
+         a = 1 | .
+         b = 2 | .
+             ^   .
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 18: a == b (large_vector, truncated, must fail)
+       13 of the 16 elements differ: 
+       idx = 1 | . |        3 |        4 |        5 |        6 |        7 |        8 | ...
+         a = 1 | . |        3 |        4 |        5 |        6 |        7 |        8 | ...
+         b = 2 | . | 99999999 | 99999999 | 99999999 | 99999999 | 99999999 | 99999999 | ...
+             ^   .   ^^^^^^^^   ^^^^^^^^   ^^^^^^^^   ^^^^^^^^   ^^^^^^^^   ^^^^^^^^   ...
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 20: shape(a) == shape(b) (large_matrix, different size, must fail)
+       All the 2 elements differ: 
+       shape(a) = 3 | 2
+       shape(b) = 2 | 3
+                  ^   ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 21: a == b (large_matrix, short, must fail)
+       3 of the 6 elements differ: 
+        F T
+        F T
+        T F
+       a(1,:) = 1 | 99999999
+       b(1,:) = 3 | 99999999
+                ^           
+       a(2,:) = 2 | 99999999
+       b(2,:) = 1 | 99999999
+                ^           
+       a(3,:) = 99999999 | 3
+       b(3,:) = 99999999 | 2
+                           ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 22: a == b (large_matrix, compress middle, must fail)
+       3 of the 12 elements differ: 
+        F T T
+        F T T
+        T T T
+        T T F
+       a(1,:) = 1 | 99999999 | 99999999
+       b(1,:) = 3 | 99999999 | 99999999
+                ^                      
+       a(2,:) = 2 | 99999999 | 99999999
+       b(2,:) = 1 | 99999999 | 99999999
+                ^                      
+       (equal rows suppressed)
+       a(4,:) = 99999999 | 99999999 | 3
+       b(4,:) = 99999999 | 99999999 | 2
+                                      ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 23: a == b (large_matrix, compress several, must fai)
+       3 of the 15 elements differ: 
+        F T T
+        T T T
+        T T F
+        T T T
+        T T F
+       a(1,:) = 1 | 99999999 | 99999999
+       b(1,:) = 3 | 99999999 | 99999999
+                ^                      
+       (equal rows suppressed)
+       a(3,:) = 99999999 | 99999999 | 1
+       b(3,:) = 99999999 | 99999999 | 2
+                                      ^
+       (equal rows suppressed)
+       a(5,:) = 99999999 | 99999999 | 3
+       b(5,:) = 99999999 | 99999999 | 4
+                                      ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 24: a == b (large_matrix, compress leading, must fai)
+       1 of the 12 elements differs: 
+        T T T
+        T T T
+        T T T
+        T T F
+       (equal rows suppressed)
+       a(4,:) = 99999999 | 99999999 | 3
+       b(4,:) = 99999999 | 99999999 | 4
+                                      ^
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 25: a == b (large_matrix, compress trailing, must fa)
+       1 of the 12 elements differs: 
+        T T T
+        T T T
+        F T T
+        T T T
+       (equal rows suppressed)
+       a(3,:) = 99999999 | 99999999 | 99999999
+       b(3,:) = 8        | 99999999 | 99999999
+                ^^^^^^^^                      
+       (equal rows suppressed)
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 26: |a-b| <=  1.0E-03 (abserr_vector, must fail)
+       2 of the 4 elements differ: 
+        index = . |                     2 |                     3
+            a = . | 1.000000000000000E+00 | 1.000000000000000E+00
+            b = . | 1.100000023841858E+00 | 8.999999761581421E-01
+                .   --^------^^^^^^^^----   ^-^^^^^^^^^^^^^^^-^-^
+       abserr = . | 1.000000238418579E-01 | 1.000000238418579E-01
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 27: |a-b| <=  1.0E-03 (abserr_matrix, must fail)
+       2 of the 4 elements differ: 
+        T F
+        F T
+       a(1,:) = 1.000000000000000E+00 | 1.000000000000000E+00
+       b(1,:) = 1.000100016593933E+00 | 8.999999761581421E-01
+                                        ^-^^^^^^^^^^^^^^^-^-^
+       abserr = 1.000165939331055E-04 | 1.000000238418579E-01
+       ------
+       a(2,:) = 1.000000000000000E+00 | 1.000000000000000E+00
+       b(2,:) = 1.100000023841858E+00 | 9.999899864196777E-01
+                --^------^^^^^^^^----                        
+       abserr = 1.000000238418579E-01 | 1.001358032226562E-05
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 28: |(a-b)/a| <=  1.0E-03 (relerr_vector, must fail)
+       2 of the 4 elements differ: 
+        index = . |                     2 |                     3
+            a = . | 1.000000000000000E+02 | 1.000000000000000E+02
+            b = . | 1.100000000000000E+02 | 9.000000000000000E+01
+                .   --^------------------   ^-------------------^
+       relerr = . | 1.000000000000001E-01 | 1.000000000000000E-01
+ 
+ 
+*** Error:
+       [unittest_test_driver] Test 29: |(a-b)/a| <=  1.0E-03 (relerr_matrix, must fail)
+       2 of the 4 elements differ: 
+        T F
+        F T
+       a(1,:) = 1.000000000000000E+02 | 1.000000000000000E+02
+       b(1,:) = 1.000100000000000E+02 | 9.000000000000000E+01
+                                        ^-------------------^
+       relerr = 1.000000000000512E-04 | 1.000000000000000E-01
+       ------
+       a(2,:) = 1.000000000000000E+02 | 1.000000000000000E+02
+       b(2,:) = 1.100000000000000E+02 | 9.999900000000001E+01
+                --^------------------                        
+       relerr = 1.000000000000001E-01 | 9.999999999905640E-06
+ 
+
+=== common_wrappers_driver_new ====================================
+- Allocate array(1:6):
+       array_sz (1:6)
+  type%array_sz (1:6)
+- Allocate array(0:5):
+       array_lu (0:5)
+  type%array_lu (0:5)
