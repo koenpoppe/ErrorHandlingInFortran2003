@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wrappers>
+	<allocate>
+		<alltypes_allranks minrank="1" typefilter="logical"/>
+		<alltypes_allranks minrank="1" typefilter="integer"/>
+		<alltypes_allranks minrank="1" typefilter="real"/>
+	</allocate>
+</wrappers>

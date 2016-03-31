@@ -2,7 +2,7 @@
 ! 
 !   Incomplete set of methods for pseudo fault tolerant user input.
 !   
-!   This illustrates the use of the <exception_handling> module.
+!   This illustrates the use of the <error_handling> module.
 ! 
 ! HISTORY
 ! 
@@ -16,17 +16,17 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-#include "exception_handling.h"
+#include "error_handling.h"
 
 module fragile_input
 
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
     use design_by_contract
-    use exception_handling
+    use error_handling
 #endif
     
     use ISO_FORTRAN_ENV, only: INPUT_UNIT
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     use ISO_FORTRAN_ENV, only: IOSTAT_END, IOSTAT_EOR
 #endif
     
@@ -35,17 +35,17 @@ module fragile_input
     save
     
     public :: fragile_integer_input, integer_input
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     public :: print_error
 #endif
 
-#ifdef EXCEPTION_HANDLING
-    type, extends(exception_info) :: fragile_input_exception
+#ifdef ERROR_HANDLING
+    type, extends(error_info) :: fragile_input_error
         integer :: nb_attempts
-        character(:),allocatable :: input_type
+        character(:), allocatable :: input_type
     contains
-        procedure, pass :: info_message => exception_info_message_fragile_input_exception
-    end type fragile_input_exception
+        procedure, pass :: info_message => error_info_message_fragile_input_error
+    end type fragile_input_error
 #endif
     
 contains
@@ -58,15 +58,15 @@ contains
         integer, intent(out) :: number
         integer, intent(in), optional :: unit, nb_attempts
         character(len=*), intent(in), optional :: question
-        TYPE_EXCEPTION, intent(out), optional :: ifail ! NOTE: was <integer>
+        TYPE_ERROR, intent(out), optional :: ifail ! NOTE: was <integer>
         logical, intent(in), optional :: verbose
         
         ! Local variables
         integer :: the_nb_attempts, attempt, lunit
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         logical :: lverbose
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         ! Make sure that handle_error behaves as expected
         if( present(ifail) ) then
             ifail = +1 ! soft silent error
@@ -82,7 +82,7 @@ contains
         
         ! Optional number of attempts
         if( present(nb_attempts) ) then
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
             if( precondition_fails(ifail,nb_attempts>=1, &
                 "<nb_attempts> must be positive") ) return ! TODO: shorter
 #else
@@ -114,7 +114,7 @@ contains
             ! Return if the integer was read correctly -> return
             ! NOTE: conventional way of checking error condition or not
             if( inform == 0 ) then 
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
                 if( present(ifail) ) then
                     ifail = 0 ! succes
                 end if
@@ -122,9 +122,9 @@ contains
                 return ! successfully read integer
             else
                 if( attempt < the_nb_attempts ) then
-#ifdef EXCEPTION_HANDLING
-                    ! We allow a new trail, so discard the exception
-                    call discard_exception( inform )
+#ifdef ERROR_HANDLING
+                    ! We allow a new trail, so discard the error
+                    call discard_error( inform )
 #endif
                     if( verbose ) then
                         write(unit=*,fmt="(A,I0,A)",advance="no") &
@@ -139,10 +139,10 @@ contains
         end do
         
         ! All attempts unsucessfull
-#ifdef EXCEPTION_HANDLING
-        ! create_exception exception including the last failiure message from integer_input
-        call create_exception(ifail, & 
-            fragile_input_exception(the_nb_attempts,"integer"), &
+#ifdef ERROR_HANDLING
+        ! create_error error including the last failiure message from integer_input
+        call create_error(ifail, & 
+            fragile_input_error(the_nb_attempts,"integer"), &
             inform,"fragile_input:fragile_integer_input")
 #else
         call handle_error( 5001, ifail )
@@ -151,17 +151,17 @@ contains
     end subroutine fragile_integer_input
 
 
-    ! Exception enhanced integer reading
+    ! Error enhanced integer reading
     subroutine integer_input( number, unit, ifail )
         use ISO_FORTRAN_ENV
         
         integer, intent(out) :: number
         integer, intent(in) :: unit
-        TYPE_EXCEPTION, intent(out), optional :: ifail ! NOTE: was <integer>
+        TYPE_ERROR, intent(out), optional :: ifail ! NOTE: was <integer>
         
         integer :: iostat
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         ! Make sure that handle_error behaves as expected
         if( present(ifail) ) then
             ifail = +1 ! soft silent error
@@ -170,9 +170,9 @@ contains
         
         read(unit=unit,fmt=*,iostat=iostat) number
         
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
         if( iostat /= 0 ) then
-            call create_exception(ifail,iostat_exception(iostat),"fragile_input:integer_input")
+            call create_error(ifail,iostat_error(iostat),"fragile_input:integer_input")
         end if
 #else
         if( iostat /= 0 ) then
@@ -186,16 +186,17 @@ contains
         
     end subroutine integer_input
 
-#ifdef EXCEPTION_HANDLING
-    subroutine exception_info_message_fragile_input_exception( info, message )
-        class(fragile_input_exception), intent(in) :: info
-        character(len=*), intent(out) :: message
+#ifdef ERROR_HANDLING
+    subroutine error_info_message_fragile_input_error( info, unit, prefix, suffix )
+        class(fragile_input_error), intent(in) :: info
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=message,fmt="(3A,I0,A)") & 
+        write(unit=unit,fmt="(4A,I0,2A)") prefix, & 
             "Failed reading a valid ", info%input_type, " within ", & 
-            info%nb_attempts, " attempts"
+            info%nb_attempts, " attempts", suffix
     
-    end subroutine exception_info_message_fragile_input_exception
+    end subroutine error_info_message_fragile_input_error
 #else
     subroutine print_error( ifail )
         integer, intent(in) :: ifail

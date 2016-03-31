@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<unittest>
+	<assert_equal>
+		<alltypes_allranks typefilter="logical"/>
+		<alltypes_allranks typefilter="integer"/>
+		<alltypes_allranks typefilter="character" maxrank="0"/>
+	</assert_equal>
+	
+    <abserr comment="These functions never cause floating point errors (i.e., inf-inf)">
+        <alltypes_allranks typefilter="real"/>
+        <alltypes_allranks typefilter="complex"/>
+    </abserr>
+    <assert_abserr>
+        <alltypes_allranks typefilter="real"/>
+        <alltypes_allranks typefilter="complex"/>
+    </assert_abserr>
+    <relerr comment="These functions never cause floating point errors (i.e., inf-inf)">
+        <alltypes_allranks typefilter="real"/>
+        <alltypes_allranks typefilter="complex"/>
+    </relerr>
+    <assert_relerr>
+        <alltypes_allranks typefilter="real"/>
+        <alltypes_allranks typefilter="complex"/>
+    </assert_relerr>
+</unittest>

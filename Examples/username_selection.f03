@@ -2,7 +2,7 @@
 ! 
 !   Utility module for selecting a valid username
 !   
-!   This illustrates the use of the <exception_handling> module.
+!   This illustrates the use of the <error_handling> module.
 ! 
 ! HISTORY
 ! 
@@ -16,13 +16,13 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 ! 
-#include "exception_handling.h"
+#include "error_handling.h"
 
 module username_selection
 
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
     use design_by_contract
-    use exception_handling
+    use error_handling
 #endif
     
     implicit none
@@ -31,7 +31,7 @@ module username_selection
     
     public :: register_username
     public :: change_future
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     public :: print_error
 #endif
 
@@ -41,12 +41,12 @@ module username_selection
     logical :: next_username_exists = .false.
     
     
-#ifdef EXCEPTION_HANDLING
-    type, extends(message_exception) :: username_exception
+#ifdef ERROR_HANDLING
+    type, extends(message_error) :: username_error
         character(:), allocatable :: username, proposed_alternative
     contains
-        procedure :: info_message => exception_info_message_username_exception
-    end type username_exception
+        procedure :: info_message => error_info_message_username_error
+    end type username_error
 #endif
 
 contains
@@ -57,21 +57,21 @@ contains
     
         ! Arguments
         character(len=*), intent(in) :: username
-        TYPE_EXCEPTION, intent(out), optional :: ifail
+        TYPE_ERROR, intent(out), optional :: ifail
         
         ! Local variables
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         character(len=len_trim(username)) :: alternative
         integer :: i
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present(ifail) ) then
             ifail = +1 ! soft silent error
         end if
 #endif
         
         ! Check preconditions on username
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
         if( precondition_fails( ifail, len_trim(username) > 0, &
             "username must not be empty" ) ) return  ! TODO: shorter
 #else
@@ -84,8 +84,8 @@ contains
         ! Check validity of username
         ! - At least one digit
         if( scan(username,"1234567890") == 0 ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, username_exception( & 
+#ifdef ERROR_HANDLING
+            call create_error(ifail, username_error( & 
                 "must contain one or more digits", & 
                 username, username//"1" ), &
                 "username_selection:register_username" )
@@ -102,8 +102,8 @@ contains
                     alternative = trim(alternative)//username(i:i)
                 end if
             end do
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, username_exception( &
+#ifdef ERROR_HANDLING
+            call create_error(ifail, username_error( &
                 "must not contain spaces", &
                 username, alternative), &
                 "username_selection:register_username" )
@@ -118,8 +118,8 @@ contains
             ! Simulate duplicate usernames
             if( next_username_exists ) then
                 next_username_exists = .false.
-#ifdef EXCEPTION_HANDLING
-                call create_exception(ifail, username_exception( &
+#ifdef ERROR_HANDLING
+                call create_error(ifail, username_error( &
                     "is already used", &
                     username, username//"_1" ), &
                     "username_selection:register_username" )
@@ -133,15 +133,15 @@ contains
             
             call close_server_connection()
            
-#ifndef EXCEPTION_HANDLING 
+#ifndef ERROR_HANDLING 
             if( inform /= 0 ) then
                 return
             end if
 #endif
             
         else
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, message_exception( & 
+#ifdef ERROR_HANDLING
+            call create_error(ifail, message_error( & 
                 "Could not verify the username"), &
                 inform, "username_selection:register_username" )
 #else
@@ -150,7 +150,7 @@ contains
             return
         end if
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present(ifail) ) then
             ifail = 0 ! succes
         end if
@@ -164,10 +164,10 @@ contains
     function open_server_connection( ifail ) result( is_open )
         
         ! Arguments
-        TYPE_EXCEPTION, intent(out), optional :: ifail
+        TYPE_ERROR, intent(out), optional :: ifail
         logical :: is_open
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present(ifail) ) then
             ifail = +1 ! soft silent error
         end if
@@ -179,8 +179,8 @@ contains
         if( next_server_connection_fails ) then
             next_server_connection_fails = .false.
             server_connection_up = .false.
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, message_exception( &
+#ifdef ERROR_HANDLING
+            call create_error(ifail, message_error( &
                 "Connection to server could not be established") )
 #else
             call handle_error( 5001, ifail )
@@ -191,7 +191,7 @@ contains
         
         is_open = server_connection_up
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present(ifail) ) then
             ifail = 0 ! succes
         end if
@@ -219,16 +219,17 @@ contains
         
     end subroutine change_future
 
-#ifdef EXCEPTION_HANDLING
-    subroutine exception_info_message_username_exception( info, message )
-        class(username_exception), intent(in) :: info
-        character(len=*), intent(out) :: message
+#ifdef ERROR_HANDLING
+    subroutine error_info_message_username_error( info, unit, prefix, suffix )
+        class(username_error), intent(in) :: info
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=message,fmt=*) "User name '", info%username, & 
+        write(unit=unit,fmt="(9A)") prefix, "User name '", info%username, & 
             "' is invalid because it ", info%message, &
-            ". Proposed alternative: '", trim(info%proposed_alternative) ,"'."
+            ". Proposed alternative: '", trim(info%proposed_alternative) ,"'.", suffix
         
-    end subroutine exception_info_message_username_exception
+    end subroutine error_info_message_username_error
 #else
     subroutine print_error( ifail )
         integer, intent(in) :: ifail

@@ -1,9 +1,9 @@
-#include "exception_handling.h"
+#include "error_handling.h"
 
 program nversion_algorithm_driver
 
     use nversion_algorithm
-    use exception_handling
+    use error_handling
 
     implicit none
     
@@ -20,15 +20,15 @@ contains
     subroutine driver_one( N )
         integer :: N
         
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         
         write(unit=*,fmt=*)
         write(unit=*,fmt="(A,I10,A)") "=> my_nversion_algorithm(", N, " )"
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         inform = -1 ! soft noisy
 #endif
         call my_nversion_algorithm( N, inform )
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
         call soft_noisy_error(inform)
 #endif
 

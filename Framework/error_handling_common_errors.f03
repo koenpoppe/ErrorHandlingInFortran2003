@@ -28,42 +28,49 @@ module error_handling_common_errors
     
 contains
     
-    subroutine allocation_error_info_message( info, message )
+    subroutine allocation_error_info_message( info, unit, prefix, suffix )
         class(allocation_error), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         if( size(info%requested_shape) == 1 ) then
-            write(unit=message,fmt="(A,I0,A,I0,A)") "Allocating array with ", info%requested_shape, & 
-                " elements did not work (error code ", info%error_code, ")."
+            write(unit=unit,fmt="(2A,I0,A,I0,2A)") prefix, &
+                "Allocating array with ", info%requested_shape, & 
+                " elements did not work (error code ", info%error_code, ").", suffix
         else
-            write(unit=message,fmt=*) "Allocating array of shape ", info%requested_shape, & 
+            write(unit=unit,fmt=*) prefix, "Allocating array of shape ", info%requested_shape, & 
                 " (=", product(info%requested_shape), & 
-                " elements) did not work (error code ", info%error_code, ")."
+                " elements) did not work (error code ", info%error_code, ").", suffix
         end if
     end subroutine allocation_error_info_message
     ! TODO: allocate wrapper for all types ...
     
-    subroutine error_code_error_info_message( info, message )
+    subroutine error_code_error_info_message( info, unit, prefix, suffix )
         class(error_code_error), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=message,fmt="(A,I0,A)") & 
-            "Encountered error code ", info%error_code, "."
+        write(unit=unit,fmt="(2A,I0,2A)") prefix, & 
+            "Encountered error code ", info%error_code, ".", suffix
         
     end subroutine error_code_error_info_message
     
-    subroutine iostat_error_info_message( info, message )
+    subroutine iostat_error_info_message( info, unit, prefix, suffix )
         use ISO_FORTRAN_ENV, only: IOSTAT_END, IOSTAT_EOR
-    
+        
         class(iostat_error), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
         select case( info%error_code )
             case(IOSTAT_END)
-                message = "End-of-file condition"
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "End-of-file condition", suffix
             case(IOSTAT_EOR)
-                message = "End-of-record condition"
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "End-of-record condition", suffix
             case default
-                write(unit=message,fmt="(A,I0,A)") "Processor dependent code ", info%error_code, "."
+                write(unit=unit,fmt="(2A,I0,2A)") prefix, &
+                    "Processor dependent code ", info%error_code, ".", suffix
         end select
         
     end subroutine iostat_error_info_message

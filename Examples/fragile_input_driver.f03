@@ -1,9 +1,9 @@
-#include "exception_handling.h"
+#include "error_handling.h"
 
 program fragile_input_driver
 
     use fragile_input
-    use exception_handling
+    use error_handling
 
     implicit none
     
@@ -41,7 +41,7 @@ contains
     subroutine run_testcase( unit )
         integer, intent(in) ::  unit 
         integer :: number
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         
         if( use_scratch ) then
             rewind(unit=unit)
@@ -56,7 +56,7 @@ contains
         if( inform == 0 ) then
             print *, "=> Number = ", number
         else
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
             call soft_noisy_error( inform )
 #else
             call print_error( inform )

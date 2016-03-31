@@ -1,9 +1,9 @@
-#include "exception_handling.h"
+#include "error_handling.h"
 
 program username_selection_driver
 
-#ifdef EXCEPTION_HANDLING
-    use exception_handling
+#ifdef ERROR_HANDLING
+    use error_handling
 #endif
     use username_selection
 
@@ -33,12 +33,12 @@ contains
     subroutine run_testcase( name )
         character(len=*), intent(in) :: name
         
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         
         write(unit=*,fmt="(3A)") "=> register_username( '", trim(name), "' )"
-        call register_username(trim(name), inform)
+        call register_username( trim(name), inform )
         if( inform /= 0 ) then
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
             call soft_noisy_error( inform )
 #else
             call print_error( inform )

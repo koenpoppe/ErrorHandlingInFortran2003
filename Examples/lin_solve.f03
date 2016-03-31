@@ -2,7 +2,7 @@
 ! 
 !   Utility module for solving trivial diagonal linear systems. 
 !
-!   This illustrates the use of the <exception_handling> module.
+!   This illustrates the use of the <error_handling> module.
 ! 
 ! REFERENCES
 !
@@ -20,13 +20,13 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 ! 
-#include "exception_handling.h"
+#include "error_handling.h"
 
 module lin_solve
 
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
     use design_by_contract
-    use exception_handling
+    use error_handling
 #endif
     
     implicit none
@@ -36,24 +36,24 @@ module lin_solve
     integer, parameter, public :: wp = kind(1.0D0)
     
     public :: solve
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     public :: print_error
 #endif
     
-#ifdef EXCEPTION_HANDLING
-    type, extends(exception_info) :: argument_exception
+#ifdef ERROR_HANDLING
+    type, extends(error_info) :: argument_error
         character(:), allocatable :: name, actual_value
         character(:), allocatable :: allowed_values
     contains
-        procedure :: info_message => exception_info_message_argument_exception
-    end type argument_exception
+        procedure :: info_message => error_info_message_argument_error
+    end type argument_error
     
-    type, extends(exception_info) :: illconditioned_exception
+    type, extends(error_info) :: illconditioned_error
         character(:), allocatable :: name
         real(kind=wp) :: lambda_min, lambda_max
     contains
-        procedure :: info_message => exception_info_message_illconditioned_exception
-    end type illconditioned_exception
+        procedure :: info_message => error_info_message_illconditioned_error
+    end type illconditioned_error
 #endif
 
 contains
@@ -63,7 +63,7 @@ contains
         real(kind=wp), dimension(:), intent(in) :: diag
         real(kind=wp), dimension(size(diag)), intent(in) :: b
         character, intent(in), optional :: trans
-        TYPE_EXCEPTION, intent( out ), optional :: ifail
+        TYPE_ERROR, intent( out ), optional :: ifail
         
         real(kind=wp), dimension(size(diag)) :: x
         
@@ -78,8 +78,8 @@ contains
             ltrans = "N"
         end if
         if( verify(ltrans,ltrans_values) /= 0 ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, argument_exception("trans",ltrans,ltrans_values) )
+#ifdef ERROR_HANDLING
+            call create_error(ifail, argument_error("trans",ltrans,ltrans_values) )
 #else
             call handle_error( 5001, ifail )
 #endif
@@ -92,8 +92,8 @@ contains
         
         ! Ill conditioned?
         if( lambda_min < lambda_max*epsilon(1.0_wp) ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, illconditioned_exception("diag",lambda_min,lambda_max) )
+#ifdef ERROR_HANDLING
+            call create_error(ifail, illconditioned_error("diag",lambda_min,lambda_max) )
 #else
             call handle_error( 5002, ifail )
 #endif
@@ -103,7 +103,7 @@ contains
         ! Solve
         x = b / diag
 
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present( ifail ) ) then
             ifail = 0
         end if
@@ -111,31 +111,33 @@ contains
         
     end function solve
     
-#ifdef EXCEPTION_HANDLING
-    subroutine exception_info_message_argument_exception( info, message )
-        class(argument_exception), intent(in) :: info
-        character(len=*), intent(out) :: message
+#ifdef ERROR_HANDLING
+    subroutine error_info_message_argument_error( info, unit, prefix, suffix )
+        class(argument_error), intent(in) :: info
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=message,fmt="(7A)") & 
+        write(unit=unit,fmt="(9A)") prefix, & 
             "Argument ", info%name, "='", info%actual_value, "' is invalid. ", & 
-            "The value must be one of the following: ", info%allowed_values
+            "The value must be one of the following: ", info%allowed_values, suffix
         
-    end subroutine exception_info_message_argument_exception
+    end subroutine error_info_message_argument_error
     
-    subroutine exception_info_message_illconditioned_exception( info, message )
-        class(illconditioned_exception), intent(in) :: info
-        character(len=*), intent(out) :: message
+    subroutine error_info_message_illconditioned_error( info, unit, prefix, suffix )
+        class(illconditioned_error), intent(in) :: info
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
         if( info%lambda_min == 0.0_wp ) then
-            write(unit=message,fmt="(3A)") &
-                "The matrix ", info%name, " is exactly singular"
+            write(unit=unit,fmt="(5A)") prefix, &
+                "The matrix ", info%name, " is exactly singular", suffix
         else
-            write(unit=message,fmt="(6A,ES10.3)") & 
+            write(unit=unit,fmt="(7A,ES10.3,A)") prefix, & 
                 "The matrix ", info%name, " is ill conditioned: ", &
-                "1/cond(", info%name, ")=", info%lambda_min/info%lambda_max
+                "1/cond(", info%name, ")=", info%lambda_min/info%lambda_max, suffix
         end if
         
-    end subroutine exception_info_message_illconditioned_exception
+    end subroutine error_info_message_illconditioned_error
 #else
     subroutine print_error( inform )
         integer, intent(in) :: inform

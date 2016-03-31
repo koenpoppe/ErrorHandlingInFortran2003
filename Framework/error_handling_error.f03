@@ -6,6 +6,15 @@
 ! 
 !   20110127 KP - Initial version
 !   20110330 KP - Splitted in seperate files
+!   20111107 KP - Solved <associated> bugs that appeared by trying to avoid
+!                      allocate( ifail%info, source=info )
+!                 
+!                 which is NOT equivalent with
+!                      allocate(ifail%info)
+!                      ifail%info=>info
+!                 Because info is intent(in), it gets deleted at the end of the method, 
+!                 and that results in a dangling pointer ...
+!   20111108 KP - Changed the info_message prototype (TODO: should be renamed...)
 ! 
 ! AUTHOR
 ! 
@@ -27,10 +36,10 @@ module error_handling_error
     !--------------------------------------------------------------------------
     
     ! 1. Abstract information type
-      type, public :: error_info ! TODO: abstract
-      contains
-          procedure, pass, public :: info_message => error_info_info_message
-      end type error_info
+    type, public :: error_info ! TODO: abstract
+    contains
+        procedure, pass, public :: info_message => error_info_info_message
+    end type error_info
 
     ! 2. Errors itself
     type, public :: error
@@ -113,37 +122,51 @@ contains
 #endif
     
     ! 2. Abstract information type
-    subroutine error_info_info_message( info, message )
+    subroutine error_info_info_message( info, unit, prefix, suffix )
         class(error_info), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
         select type(info)
             type is(error_info)
-                message = "No specific information available ..."
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "No specific information available ...", suffix
             class default
-                message = "(override the 'info_message' type bound procedure to provide a meaningfull messages)"
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "(override the 'info_message' type bound procedure to provide a meaningful messages)", suffix
         end select
         
     end subroutine error_info_info_message
     
-    subroutine message_error_info_message( info, message )
+    subroutine message_error_info_message( info, unit, prefix, suffix )
         class(message_error), intent(in) ::  info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
 
-        if( allocated(info%message) ) then
-           message = info%message
+        if( allocated(info%message) ) then ! TODO precondition
+            write(unit=unit,fmt="(3A)") prefix, &
+                trim(info%message), suffix
         else
-           message = "BUG? - not allocated -"
+            write(unit=unit,fmt="(3A)") prefix, &
+                "INTERNAL BUG? info%message not allocated"
         end if
 
     end subroutine message_error_info_message
     
     ! 3. Sentinel no-error information type
-    subroutine no_error_info_message( info, message )
+    subroutine no_error_info_message( info, unit, prefix, suffix )
         class(no_error), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
         
-        write(unit=message,fmt="(A,I0)") "INTERNAL ERROR: no error here."
+        select type( info )
+            type is(no_error)
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "INTERNAL ERROR: no error here.", suffix
+            class default
+                write(unit=unit,fmt="(3A)") prefix, &
+                    "EXTERNAL ERROR: you should not extend the no_error derived type.", suffix
+        end select
         
     end subroutine no_error_info_message
     
@@ -185,9 +208,7 @@ contains
         character(len=*), intent(in), optional :: method
         
         ! Prepare the error
-        !allocate( ifail%info, source=info ) ! Shorter form, but ifort does not support this.
-        allocate(ifail%info)
-        ifail%info=>info
+        allocate( ifail%info, source=info ) ! 20111107 KP (see HISTORY)
         
         if( present(method) ) then
             if( len_trim(method) > 0 ) then
@@ -239,8 +260,8 @@ contains
         type(error), intent(out), optional ::  ifail
         class(error_info), intent(in) :: info
         character(len=*), intent(in) :: method
-    
-        type(error) :: empty        
+        
+        type(error) :: empty
         empty = empty_error()
         call create_error_full( ifail, info, empty, method )
         
@@ -272,7 +293,6 @@ contains
     end subroutine transfer_error
 
     ! 3. Reporting
-    ! TODO: unit
     subroutine report_error( exc, fatal )
         type(error), intent(in out) :: exc
         logical, intent(in), optional :: fatal
@@ -304,8 +324,8 @@ contains
         type(error), intent(in) :: exc
         integer, intent(in) :: level
         
-        ! Local variables
-        character(len=200) :: message
+        ! Is this actually an exception with information?
+        if( .not. associated(exc%info) ) return
         
         if( level == 0 ) then
             write(unit=REPORT_UNIT,fmt="(A)",advance="no") "*** Error"
@@ -318,8 +338,8 @@ contains
         write(unit=REPORT_UNIT,fmt="(A)") ":"
         
         if( associated(exc%info) ) then
-            call exc%info%info_message(message)
-            write(unit=REPORT_UNIT,fmt="(2A)") "       ", trim(adjustl(message))
+!             call exc%info%info_message( REPORT_UNIT, "<line>", "</line>" ) ! TODO: xml output
+            call exc%info%info_message( REPORT_UNIT, "       ", "" )
         end if
         
         if( associated( exc%reason ) ) then ! TODO: necessary?
@@ -347,9 +367,8 @@ contains
         class(error), intent(in out) :: inform
         
         if( associated(inform%info) ) then
-            !allocate( ifail%info, source=inform%info ) ! Shorter form, but unsupported by ifort
-            allocate(ifail%info)
-            ifail%info=>inform%info
+            allocate( ifail%info, source=inform%info ) ! 20111107 KP (see HISTORY)
+            nullify( inform%info )
         end if
         
         if( allocated(inform%method) ) then
@@ -362,7 +381,7 @@ contains
         end if
         
         ifail%handled = inform%handled
-    
+        
     end subroutine error_assignment_safe
 
 end module error_handling_error

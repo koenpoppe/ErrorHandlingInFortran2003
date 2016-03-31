@@ -4,7 +4,7 @@
 !   memory usage. Depending on the available amount of memory, which is not
 !   determinable in advance, the best algorithm is chosen.
 !   
-!   This illustrates the use of the <exception_handling> module.
+!   This illustrates the use of the <error_handling> module.
 ! 
 ! HISTORY
 ! 
@@ -18,12 +18,12 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-#include "exception_handling.h"
+#include "error_handling.h"
 
 module nversion_algorithm
 
-#ifdef EXCEPTION_HANDLING
-    use exception_handling
+#ifdef ERROR_HANDLING
+    use error_handling
 #endif
     
     implicit none
@@ -32,7 +32,7 @@ module nversion_algorithm
     
     public :: my_nversion_algorithm
     
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     public :: print_error
 #endif
     
@@ -45,53 +45,53 @@ contains
         
         ! Arguments
         integer, intent(in) :: N
-        TYPE_EXCEPTION_ARGUMENT, optional :: ifail
+        TYPE_ERROR_ARGUMENT, optional :: ifail
         
         ! Local variables
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
 
         ! Try version 1
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         inform = -1 ! soft noisy
 #endif
         call allocate_workspace( N*N*N, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 1."
             deallocate(workspace)
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
             if( present(ifail) ) then
                 ifail = 0 ! success
             end if
 #endif            
             return
         end if
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
         call soft_silent_error( inform ) ! Discard, we'll try something else
 #endif
         
         ! Try version 2
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         inform = -1 ! soft noisy
 #endif
         call allocate_workspace( N*N, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 2."
             deallocate(workspace)
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
             if( present(ifail) ) then
                 ifail = 0 ! success
             end if
 #endif            
             return
         end if
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
         call soft_silent_error( inform ) ! Discard, we'll try something else
 #endif
 
         ! Try version 3, which is only valid for N even
         if( mod(N,2) == 1 ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(inform, message_exception( & 
+#ifdef ERROR_HANDLING
+            call create_error(inform, message_error( & 
                 "Version 3 is only valid for even values of N"), &
                 "nversion_algorithm:my_nversion_algorithm" )
 #else
@@ -99,14 +99,14 @@ contains
             call handle_error( 3001, inform )
 #endif
         else
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
             inform = -1 ! soft noisy
 #endif
             call allocate_workspace( N, inform )
             if( inform == 0 ) then
                 write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 3."
                 deallocate(workspace)
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
                 if( present(ifail) ) then
                     ifail = 0 ! success
                 end if
@@ -116,8 +116,8 @@ contains
         end if
         
         ! Bailing out, no versions left
-#ifdef EXCEPTION_HANDLING
-        call create_exception(ifail, message_exception( &
+#ifdef ERROR_HANDLING
+        call create_error(ifail, message_error( &
             "Failed to perform any of the versions of the algorithm"), &
             inform,"nversion_algorithm:my_nversion_algorithm" )
 #else
@@ -127,12 +127,12 @@ contains
     end subroutine my_nversion_algorithm
 
 
-    ! Exception enhanced workspace allocation
+    ! Error enhanced workspace allocation
     subroutine allocate_workspace( workspace_size, ifail )
         
         ! Arguments
         integer, intent(in) :: workspace_size
-        TYPE_EXCEPTION_ARGUMENT, optional :: ifail 
+        TYPE_ERROR_ARGUMENT, optional :: ifail 
         
         ! Local arguments
         integer :: stat
@@ -140,8 +140,8 @@ contains
                 
         ! Enforce a fixed memory bound
         if( workspace_size > workspace_bound ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, allocation_exception( workspace_bound, (/ workspace_size /) ), &
+#ifdef ERROR_HANDLING
+            call create_error(ifail, allocation_error( workspace_bound, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace:enforced" )
 #else
             call handle_error( 81001, ifail )
@@ -151,8 +151,8 @@ contains
         
         ! Verify unreasonable sizes
         if( workspace_size < 0) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, allocation_exception( -1, (/ workspace_size /) ), &
+#ifdef ERROR_HANDLING
+            call create_error(ifail, allocation_error( -1, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace:negative" )
 #else
             call handle_error( 81002, ifail )
@@ -163,8 +163,8 @@ contains
         ! Allocate the array
         allocate( workspace(workspace_size), stat=stat )
         if( stat /= 0 ) then
-#ifdef EXCEPTION_HANDLING
-            call create_exception(ifail, allocation_exception( stat, (/ workspace_size /) ), &
+#ifdef ERROR_HANDLING
+            call create_error(ifail, allocation_error( stat, (/ workspace_size /) ), &
                 "nversion_algorithm:allocate_workspace" )
 #else
             call handle_error( 81000 + stat, ifail )
@@ -172,7 +172,7 @@ contains
             return
         end if
         
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
         if( present(ifail) ) then
             ifail = 0 ! success
         end if
@@ -180,7 +180,7 @@ contains
         
     end subroutine allocate_workspace
     
-#ifndef EXCEPTION_HANDLING
+#ifndef ERROR_HANDLING
     subroutine print_error( inform )
         integer, intent(in) :: inform
         select case( inform )

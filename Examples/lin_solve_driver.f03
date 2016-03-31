@@ -1,9 +1,9 @@
-#include "exception_handling.h"
+#include "error_handling.h"
 
 program lin_solve_driver
 
-#ifdef EXCEPTION_HANDLING
-    use exception_handling
+#ifdef ERROR_HANDLING
+    use error_handling
 #endif
     use lin_solve
     
@@ -51,7 +51,7 @@ contains
         character, intent(in), optional :: trans
         real(kind=wp), dimension(size(b)) :: x
         
-        TYPE_EXCEPTION :: inform
+        TYPE_ERROR :: inform
         
         x = solve( a,b, trans, ifail=inform )
         if( inform == 0 ) then
@@ -59,7 +59,7 @@ contains
             write(unit=*,fmt="(1X,6E11.3)") x
         else
             write(unit=*,fmt="(A)") "No solution returned in x because"
-#ifdef EXCEPTION_HANDLING
+#ifdef ERROR_HANDLING
             call soft_noisy_error( inform )
 #else
             call print_error( inform )

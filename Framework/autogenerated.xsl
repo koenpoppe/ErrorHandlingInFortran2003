@@ -13,6 +13,7 @@
 		<type format="I8">integer</type>
 		<type format="ES13.5">real</type>
 		<type format="ES23.16">real(kind=kind(1.0d0))</type>
+        <type format="A20">character(len=*)</type>
         <!-- <type format="ES13.5">complex</type>
         <type format="ES23.16">complex(kind=kind(1.0d0))</type> -->
 	</xsl:variable>
@@ -21,7 +22,7 @@
 	<xsl:variable name="ranks">
 		<rank>0</rank>
 		<rank>1</rank>
-		<rank>2</rank>
+        <rank>2</rank>
 		<!-- <rank>3</rank> -->
 	</xsl:variable>
 
@@ -54,6 +55,13 @@
 				<xsl:otherwise>0</xsl:otherwise>
 			</xsl:choose>
 		</xsl:variable>
+		<xsl:variable name="maxrank">
+			<xsl:choose>
+				<xsl:when test="@maxrank"><xsl:value-of select="@maxrank"/></xsl:when>
+				<xsl:otherwise>10</xsl:otherwise>
+			</xsl:choose>
+		</xsl:variable>
+		
 		<xsl:variable name="typefilter"><xsl:value-of select="@typefilter"/></xsl:variable>
 		
 		<xsl:if test="string-length($typefilter) &gt; 0 and $debug">
@@ -65,7 +73,7 @@
 				<xsl:element name="{name(..)}">
 					<xsl:for-each select="exsl:node-set($types)/type[ string-length($typefilter)=0 or starts-with(.,$typefilter)]">
 						<xsl:variable name="type" select="."/>
-						<xsl:for-each select="exsl:node-set($ranks)/rank[ $minrank &lt;= . ]">
+						<xsl:for-each select="exsl:node-set($ranks)/rank[ $minrank &lt;= . and . &lt;= $maxrank ]">
 							<xversion>
 								<xsl:attribute name="type"><xsl:value-of select="$type"/></xsl:attribute>
 								<xsl:attribute name="rank"><xsl:value-of select="."/></xsl:attribute>
@@ -153,13 +161,13 @@
 	</xsl:template>
 
 	<xsl:template name="name-mangler">
-<xsl:value-of select="name(..)"/><xsl:for-each select="str:tokenize(str:replace(str:replace(@type,'complex(kind=kind(1.0d0))','complex_double'),'real(kind=kind(1.0d0))','real_double'),' =().')">_<xsl:value-of select="."/></xsl:for-each>_rank<xsl:value-of select="@rank"/>
+<xsl:value-of select="name(..)"/><xsl:for-each select="str:tokenize(str:replace(str:replace(str:replace(@type,'*','star'),'complex(kind=kind(1.0d0))','complex_double'),'real(kind=kind(1.0d0))','real_double'),' =().')">_<xsl:value-of select="."/></xsl:for-each>_rank<xsl:value-of select="@rank"/>
 	</xsl:template>
 	
 	<xsl:template name="type-width">
 		<xsl:variable name="type" select="@type"/>
 		<xsl:for-each select="exsl:node-set($types)/type[ . = $type]">
-			<xsl:value-of select="str:tokenize(@format,'LIFES.')[1]"/>
+			<xsl:value-of select="str:tokenize(@format,'LIFESA.')[1]"/>
 		</xsl:for-each>
 	</xsl:template>
 	<xsl:template name="type-format">

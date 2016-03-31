@@ -5,13 +5,13 @@ MAKEFLAGS+= --no-print-directory
 
 # Library
 LIBRARY_DIR=../Framework/Build_$(FC)/
-LIBRARY=-lexception_handling
+LIBRARY=-lerror_handling
 
 # Fortran compiler and flags
 FC=nagfor_beta
 FPP=$(FC)
 
-FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v 
+FFLAGS_nagfor=-f2003 -I $(LIBRARY_DIR) -colour -O0 -C=all -fpp -v -g90
 FFLAGS_nagfor_beta=$(FFLAGS_nagfor)
 
 FFLAGS_ifort=-stand f03 -I $(LIBRARY_DIR) -fpp -g -check -warn -free -Tf
@@ -23,11 +23,11 @@ LDFLAGS= -L$(LIBRARY_DIR) $(LIBRARY)
 	$(FC) -c $(DEFINES) $(FFLAGS) $^
 
 clean:
-	$(RM) *.o *.mod
+	$(RM) *.o *.mod *.g90
 
 # The available examples and the selected one
 EXAMPLES=username_selection nversion_algorithm fragile_input lin_solve
-EXAMPLE=unittest_test
+EXAMPLE=username_selection
 
 # The corresponding drivers
 DRIVERS=$(addsuffix _driver,$(EXAMPLES))
@@ -36,7 +36,7 @@ DRIVER=$(EXAMPLE)_driver
 # Error handling version selection: old or new
 VERSION=new
 ifeq ($(VERSION),new)
-	DEFINES=-DEXCEPTION_HANDLING
+	DEFINES=-DERROR_HANDLING
 else
 	DEFINES=
 endif
@@ -93,7 +93,7 @@ cleanlogs:
 	$(RM) $(DRIVERS_LOG)
 
 # Documentation
-SOURCE_LIST=exception_handling.f03
+SOURCE_LIST=error_handling.f03
 doc: $(SOURCE_LIST)
 	@echo "FortranDOC is processing your source files"
 	@echo $(SOURCE_LIST) | tr ' ' '\n' > docsourcelist 

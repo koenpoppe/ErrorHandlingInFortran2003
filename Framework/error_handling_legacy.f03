@@ -50,8 +50,7 @@ contains
     !--------------------------------------------------------------------------
     ! Commonly used terminology
     !--------------------------------------------------------------------------
-    ! TODO: unit?
-    
+
     ! Do not report the error
     subroutine soft_silent_error( ifail )
         type(error), intent(in out) :: ifail
@@ -69,11 +68,11 @@ contains
         type(error), intent(in out) :: ifail
         call report_error( ifail, fatal = .true. )
     end subroutine hard_noisy_error
-    
+
     !--------------------------------------------------------------------------
     ! Convienience operator overloading
     !--------------------------------------------------------------------------
-    
+
     function error_eq_int( exc, code ) result( equal )
         class(error), intent(in) :: exc
         integer, intent(in) :: code

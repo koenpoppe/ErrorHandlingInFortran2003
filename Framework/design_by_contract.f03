@@ -56,7 +56,7 @@ contains
         logical :: failed
         failed = .not. condition
         if( failed ) then
-            call create_error(ifail, precondition_error(message))
+            call create_error( ifail, precondition_error(message) )
         end if
     end function precondition_full
 
@@ -71,9 +71,10 @@ contains
         end if
     end function postcondition_full
 
-    subroutine error_info_message_dbc_error( info, message )
+    subroutine error_info_message_dbc_error( info, unit, prefix, suffix )
         class(dbc_error), intent(in) :: info
-        character(len=*), intent(out) :: message
+        integer, intent(in) :: unit
+        character(len=*), intent(in) :: prefix, suffix
 
         character(len=12) :: condition
         
@@ -86,7 +87,7 @@ contains
                 condition = "General DBC"
         end select
         
-        write(unit=message,fmt=*) condition, " violation: ", info%message
+        write(unit=unit,fmt="(5A)") prefix, condition, " violation: ", info%message, suffix
         
     end subroutine error_info_message_dbc_error
 
