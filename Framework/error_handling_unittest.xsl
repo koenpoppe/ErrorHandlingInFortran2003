@@ -265,7 +265,6 @@ contains<xsl:text/>
         logical, intent(in) :: expression
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         type(error) :: local_ifail
-        if( skip_<xsl:value-of select="."/>() ) return
         associate( ifail=>local_ifail )
             call assert_logical( expression, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         end associate
@@ -1007,7 +1006,6 @@ end module error_handling_unittest<xsl:text/>
         <xsl:value-of select="@type"/><xsl:call-template name="rank-specification"/>, intent(in) :: a,b<xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         type(error) :: local_ifail
-        if( skip_<xsl:value-of select="$type"/>() ) return
         associate( ifail=>local_ifail )
             call <xsl:call-template name="name-mangler"/>( a,b, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         end associate
@@ -1207,7 +1205,6 @@ end module error_handling_unittest<xsl:text/>
         <xsl:call-template name="real-type"/>, intent(in) :: <xsl:value-of select="$err_tol"/><xsl:text/>
         <xsl:value-of select="$ASSERT_OPTIONS_DECLARATION"/>
         type(error) :: local_ifail
-        if( skip_<xsl:value-of select="$type"/>() ) return
         associate( ifail=>local_ifail )
             call <xsl:call-template name="name-mangler"/>( a, b, <xsl:value-of select="$err_tol"/>, <xsl:value-of select="$ASSERT_OPTIONS"/> )
         end associate

@@ -7,6 +7,7 @@
 !   20101021 KP - Rewritten version
 !   20101110 KP - Added Postconditions, ...
 !   20120123 KP - DBC errors are no longer 'cachable'
+!   20160417 KP - Unit tests are not be skipped
 ! 
 ! AUTHOR
 ! 
@@ -29,12 +30,10 @@ module design_by_contract
     logical :: check_precondition = .true.
     logical :: check_postcondition = .true.
     logical :: check_check = .true.
-    logical :: check_unittest = .true. ! TODO: .true. by definition?
     
     public :: skip_precondition
     public :: skip_postcondition
     public :: skip_check
-    public :: skip_unittest
     
     !--------------------------------------------------------------------------
     ! Settings
@@ -65,12 +64,6 @@ contains
         skip = .not. check_check
           if( skip ) print *, "skip_postcondition"
     end function skip_check
-    
-    function skip_unittest() result(skip)
-        logical :: skip
-        skip = .not. check_unittest
-        if( skip ) print *, "skip_postcondition"
-    end function skip_unittest
 
     !--------------------------------------------------------------------------
     ! Settings
