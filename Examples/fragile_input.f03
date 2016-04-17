@@ -87,7 +87,7 @@ contains
         ! Optional number of attempts
         if( present(nb_attempts) ) then
 #ifdef ERROR_HANDLING
-            call assert_gt( nb_attempts, 1, "<nb_attempts> must be positive", ifail )
+            call assert_ge( nb_attempts, 1, "<nb_attempts> must be positive", ifail )
             if( ifail /= 0 ) return
 !             if( precondition_fails(ifail,nb_attempts>=1, &
 !                 "<nb_attempts> must be positive") ) return ! TODO: shorter
