@@ -56,13 +56,13 @@ contains
     function skip_postcondition() result(skip)
         logical :: skip
         skip = .not. check_postcondition
-          if( skip ) print *, "skip_postcondition"
+        if( skip ) print *, "skip_postcondition"
     end function skip_postcondition
     
     function skip_check() result(skip)
         logical :: skip
         skip = .not. check_check
-          if( skip ) print *, "skip_postcondition"
+        if( skip ) print *, "skip_check"
     end function skip_check
 
     !--------------------------------------------------------------------------
