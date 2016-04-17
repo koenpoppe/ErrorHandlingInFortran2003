@@ -85,8 +85,6 @@ contains
 #ifdef ERROR_HANDLING
         call assert_gt( len_trim(username), 0, "username must not be empty", ifail, a_name="len_trim(username)" )
         if( ifail /= 0 ) return
-!         if( precondition_fails( ifail, len_trim(username) > 0, &
-!             "username must not be empty" ) ) return  ! TODO: shorter
 #else
         if( len_trim(username) == 0 ) then
             call handle_error( 4000, ifail )

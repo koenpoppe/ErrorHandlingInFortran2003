@@ -89,8 +89,6 @@ contains
 #ifdef ERROR_HANDLING
             call assert_ge( nb_attempts, 1, "<nb_attempts> must be positive", ifail )
             if( ifail /= 0 ) return
-!             if( precondition_fails(ifail,nb_attempts>=1, &
-!                 "<nb_attempts> must be positive") ) return ! TODO: shorter
 #else
             if( nb_attempts<1 ) then
                 call handle_error( 5000, ifail )
