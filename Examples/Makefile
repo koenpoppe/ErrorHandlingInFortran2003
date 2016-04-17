@@ -146,7 +146,7 @@ allclean:
 	$(MAKE) veryclean VERSION=new
 
 REGRESSION_FILENAME="regression/$(FC)_$(shell date +'%Y%m%d').txt"
-regression: veryclean all
+regression: veryclean framework all
 	@echo $(REGRESSION_FILENAME)
 	@$(FC_VERSION_CMD) 1>  $(REGRESSION_FILENAME)
 	@$(FC_VERSION_CMD) 2>> $(REGRESSION_FILENAME)
@@ -172,3 +172,6 @@ test: dbc_test
 
 cleanothers:
 	$(RM) unittest_test dbc_test
+
+framework:
+	cd ../Framework; make
