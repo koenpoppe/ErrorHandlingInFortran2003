@@ -22,8 +22,6 @@
 !   B-3001 Heverlee, Belgium
 !   Email:  Koen.Poppe@cs.kuleuven.be
 !
-! 2012-06-26 TODO: KP - What about different array bounds (i.e, allocate(a(0:4)) )
-!                     - Lazy allocation?
 module error_handling_common_wrappers
     use error_handling_error
     use error_handling_common_errors

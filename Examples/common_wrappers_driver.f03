@@ -18,5 +18,6 @@ program common_wrappers_driver
     implicit none
 
     call test_allocation()
+    call test_lazyallocation()
 
 end program common_wrappers_driver
