@@ -35,7 +35,7 @@ module error_handling_common_errors
         module procedure allocation_error_constructor
     end interface allocation_error
 #endif
-    integer, dimension(:), public, allocatable :: allocation_error_requested_lower, allocation_error_requested_upper ! TODO: private
+    integer, dimension(:), private, allocatable :: allocation_error_requested_lower, allocation_error_requested_upper
 #endif
 
     ! - enumeration error
