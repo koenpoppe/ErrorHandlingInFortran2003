@@ -43,7 +43,7 @@ module error_handling_error
     !--------------------------------------------------------------------------
     
     ! 1. Abstract information type
-    type, public :: error_info ! TODO: abstract
+    type, abstract, public :: error_info
     contains
         procedure, pass, public :: write_to => error_info_write_to
     end type error_info
@@ -152,9 +152,6 @@ contains
         character(len=*), intent(in) :: prefix, suffix
         
         select type(info)
-            type is(error_info)
-                write(unit=unit,fmt="(3A)") prefix, &
-                    "No specific information available ...", suffix
             class default
                 write(unit=unit,fmt="(3A)") prefix, &
                     "(override the 'write_to' type bound procedure to provide a meaningful messages)", suffix
