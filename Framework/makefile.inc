@@ -41,17 +41,17 @@ FFLAGS_gfortran+=-O0 -g -fbacktrace
 FFLAGS_gfortran+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
 
 ###############################################################################
-# ifort_beta (IFORT) 12.1.0 20111011 - partially
-# ifort_beta (IFORT) 12.1.2 20111128 - problem with derived type constructors
-# ifort_beta (IFORT) 12.1.5 20120612 - requires "-standard-semantics" for assignments to allocatable arrays
-FFLAGS_ifort_beta=-std03 -check -warn -fpp
-FFLAGS_ifort_beta+=-standard-semantics
-FFLAGS_ifort_beta+=-O0 -g
-FFLAGS_ifort_beta+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
-FFLAGS_ifort_beta+=-DFC_NO_ALLOCATABLE_DTCOMP
-FFLAGS_ifort_beta+=-DFC_NO_DT_CONSTRUCTOR
+# ifort (IFORT) 12.1.0 20111011 - partially
+# ifort (IFORT) 12.1.2 20111128 - problem with derived type constructors
+# ifort (IFORT) 12.1.5 20120612 - requires "-standard-semantics" for assignments to allocatable arrays
+FFLAGS_ifort=-std03 -check -warn -fpp
+FFLAGS_ifort+=-standard-semantics
+FFLAGS_ifort+=-O0 -g
+FFLAGS_ifort+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
+FFLAGS_ifort+=-DFC_NO_ALLOCATABLE_DTCOMP
+FFLAGS_ifort+=-DFC_NO_DT_CONSTRUCTOR
 
-# Must be last of the flags, so use FFLAGS_ifort_beta:= ... $(FFLAGS_ifort_beta) to add more options
-FFLAGS_ifort_beta+=-free -Tf
+# Must be last of the flags, so use FFLAGS_ifort:= ... $(FFLAGS_ifort) to add more options
+FFLAGS_ifort+=-free -Tf
 
 ###############################################################################
