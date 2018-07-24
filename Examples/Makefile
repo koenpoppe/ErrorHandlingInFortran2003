@@ -4,7 +4,6 @@ first: all
 # Fortran compiler
 
 # FC=nagfor
-# FC=gfortran_beta
 # FC=ifort_beta
 FC=gfortran
 
@@ -17,7 +16,6 @@ LIBRARY_DIR=$(LIBRARY_PATH)$(FC)_build/
 LIBRARY=-lerror_handling
 
 # Extra flags
-FFLAGS_gfortran_beta+=-J $(LIBRARY_DIR)
 FFLAGS_ifort_beta:=-I $(LIBRARY_DIR) $(FFLAGS_ifort_beta)
 FFLAGS_nagfor+= -I $(LIBRARY_DIR)
 FFLAGS_gfortran+=-J $(LIBRARY_DIR)
@@ -25,7 +23,6 @@ FFLAGS_gfortran+=-J $(LIBRARY_DIR)
 FFLAGS=$(FFLAGS_$(FC))
 
 # Command to get version
-FC_VERSION_CMD_gfortran_beta=$(FC) --version
 FC_VERSION_CMD_ifort_beta=$(FC) --version
 FC_VERSION_CMD_nagfor=$(FC) -V
 FC_VERSION_CMD_gfortran=$(FC) --version

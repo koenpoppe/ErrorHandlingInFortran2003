@@ -34,17 +34,6 @@ FFLAGS_nagfor_alt5=-DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
 FFLAGS_nagfor+=$(FFLAGS_nagfor_alt$(ALT))
 
 ###############################################################################
-# GNU Fortran (GCC) 4.7.0 20111013 (experimental)
-#    - no finalisation yet
-#    - gfortran_beta -c -std=f2003  -J gfortran_beta_build/ -cpp -O0 -g -DFC_NO_FINAL_SUPPORT error_handling_error.f03
-#      f951: internal compiler error: in gfc_get_derived_type, at fortran/trans-types.c:2394
-# GNU Fortran (GCC) 4.8.0 20120722 (experimental)
-
-FFLAGS_gfortran_beta=-std=f2003 -Wall -cpp -ffree-line-length-none -pedantic -Wimplicit-interface -Wunderflow -fbounds-check -fimplicit-none
-FFLAGS_gfortran_beta+=-O0 -g -fbacktrace
-FFLAGS_gfortran_beta+=-DFC_NO_FINAL_SUPPORT -DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
-
-###############################################################################
 # GNU Fortran (GCC) 5.2.0 2015
 
 FFLAGS_gfortran=-std=f2003 -Wall -cpp -ffree-line-length-none -pedantic -Wimplicit-interface -Wunderflow -fbounds-check -fimplicit-none
