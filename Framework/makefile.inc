@@ -9,13 +9,13 @@
 ###############################################################################
 # NAG Fortran Compiler Release 5.3(842) - First fully supported version
 # NAG Fortran Compiler Release 5.3(856)
-FFLAGS_nagfor_beta=-f2003 -colour -v -fpp
-FFLAGS_nagfor_beta+=-O0 -C=all -g90
+FFLAGS_nagfor=-f2003 -colour -v -fpp
+FFLAGS_nagfor+=-O0 -C=all -g90
 
 # <temp>
-FFLAGS_nagfor_beta+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
-FFLAGS_nagfor_beta+=-DFC_NO_ALLOCATABLE_DTCOMP
-FFLAGS_nagfor_beta+=-DFC_NO_DT_CONSTRUCTOR
+FFLAGS_nagfor+=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
+FFLAGS_nagfor+=-DFC_NO_ALLOCATABLE_DTCOMP
+FFLAGS_nagfor+=-DFC_NO_DT_CONSTRUCTOR
 # </temp>
 
 # For verifying the FC_.* options
@@ -26,12 +26,12 @@ alt:
 	$(MAKE) ALT=4
 	$(MAKE) ALT=5
 
-FFLAGS_nagfor_beta_alt1=-DFC_NO_SAME_TYPE_AS_SUPPORT
-FFLAGS_nagfor_beta_alt2=-DFC_NO_FINAL_SUPPORT
-FFLAGS_nagfor_beta_alt3=-DFC_NO_ALLOCATABLE_DTCOMP
-FFLAGS_nagfor_beta_alt4=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
-FFLAGS_nagfor_beta_alt5=-DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
-FFLAGS_nagfor_beta+=$(FFLAGS_nagfor_beta_alt$(ALT))
+FFLAGS_nagfor_alt1=-DFC_NO_SAME_TYPE_AS_SUPPORT
+FFLAGS_nagfor_alt2=-DFC_NO_FINAL_SUPPORT
+FFLAGS_nagfor_alt3=-DFC_NO_ALLOCATABLE_DTCOMP
+FFLAGS_nagfor_alt4=-DFC_FIXED_LENGTH_CHARACTERSTRINGS
+FFLAGS_nagfor_alt5=-DFC_NO_ALLOCATABLE_DTCOMP -DFC_FIXED_LENGTH_CHARACTERSTRINGS
+FFLAGS_nagfor+=$(FFLAGS_nagfor_alt$(ALT))
 
 ###############################################################################
 # GNU Fortran (GCC) 4.7.0 20111013 (experimental)
