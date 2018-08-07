@@ -89,6 +89,9 @@ module error_handling_error
     contains
         procedure :: write_to => message_error_write_to
     end type message_error
+#ifdef FC_NO_DT_CONSTRUCTOR
+    public :: message_error_constructor
+#endif
     
     !--------------------------------------------------------------------------
     ! Operations for errors
@@ -177,6 +180,14 @@ contains
         end if
 
     end subroutine message_error_write_to
+#ifdef FC_NO_DT_CONSTRUCTOR
+    function message_error_constructor( message ) result ( info )
+        character(len=*), intent(in) :: message
+        type(message_error) :: info
+            
+        info%message = message
+    end function message_error_constructor
+#endif
     
     ! 3. Sentinel no-error information type
     subroutine no_error_write_to( info, unit, prefix, suffix )
