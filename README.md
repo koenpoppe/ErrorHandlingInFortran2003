@@ -10,14 +10,14 @@ This package requires both
 * a XSLT processor (required for preprocessing) and
 * a Fortran compiler which supports at least a subset of the Fortran 2003 standard.
 
-The software has been succesfully tested with
+The software has been successfully tested with
 * NAG Fortran Compiler Release 5.3(856) and
 * GNU Fortran (GCC) 4.7.0 20111129 (experimental).
 * GNU Fortran (GCC) 5.2.0 2015
 * GNU Fortran (GCC) 6.3.0 2016
 * Intel Fortran Compiler 12.1.5 20120612 (experimental)
 
-For these compilers, compiler flags are included in the Makefile and compilation is as simple as running `make`. This will, amongst others, determine which kinds of integers, real and complex values are supported and preproces the package so its functionality can be used for each of them.
+For these compilers, compiler flags are included in the Makefile and compilation is as simple as running `make`. This will, amongst others, determine which kinds of integers, real and complex values are supported and preprocess the package so its functionality can be used for each of them.
 
 Other compilers might require some additional modifications to the Makefile in order to build the package. If the support for Fortran 2003 is not complete, certain features can be turned of using the following defines:
 * FC_NO_FINAL_SUPPORT: disables the finalisation of error type objects. Note that this also disables the feature of detecting ignored errors.
