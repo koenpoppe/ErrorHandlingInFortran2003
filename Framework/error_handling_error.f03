@@ -201,7 +201,7 @@ contains
     
     ! 1. Creation/chaining
     
-    pure function empty_error() result( exc )
+    function empty_error() result( exc )
         type(error) :: exc
         exc%handled = .true. ! TODO: This is an empty error
     end function empty_error
