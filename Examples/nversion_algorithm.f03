@@ -54,7 +54,7 @@ contains
 #ifndef ERROR_HANDLING
         inform = -1 ! soft noisy
 #endif
-        call allocate_workspace( N*N*N, inform )
+        call allocate_workspace( N, 3, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 1."
             if( allocated(workspace) ) then
@@ -77,7 +77,7 @@ contains
 #ifndef ERROR_HANDLING
         inform = -1 ! soft noisy
 #endif
-        call allocate_workspace( N*N, inform )
+        call allocate_workspace( N, 2, inform )
         if( inform == 0 ) then
             write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 2."
             if( allocated(workspace) ) then
@@ -110,7 +110,7 @@ contains
 #ifndef ERROR_HANDLING
             inform = -1 ! soft noisy
 #endif
-            call allocate_workspace( N, inform )
+            call allocate_workspace( N, 1, inform )
             if( inform == 0 ) then
                 write(unit=*,fmt="(A)") "Performing my_nversion_algorithm version 3."
                 if( allocated(workspace) ) then
@@ -139,16 +139,35 @@ contains
     end subroutine my_nversion_algorithm
 
     ! Error enhanced workspace allocation
-    subroutine allocate_workspace( workspace_size, ifail )
+    subroutine allocate_workspace( workspace_base, workspace_power, ifail )
         
         ! Arguments
-        integer, intent(in) :: workspace_size
+        integer, intent(in) :: workspace_base
+        integer, intent(in) :: workspace_power
         TYPE_ERROR_ARGUMENT, optional :: ifail 
         
         ! Local arguments
-        integer :: stat
+        integer :: stat, workspace_size
         integer, parameter :: workspace_bound = 1000000
         type(allocation_error) :: info
+        
+        ! Check for overflow in calculating the workspace size
+        if(real(workspace_base) > huge(workspace_size)**(1.0/workspace_power)) then
+#ifdef ERROR_HANDLING
+            call create_error(ifail, &
+#ifdef FC_NO_DT_CONSTRUCTOR
+                message_error_constructor( &
+#else
+                message_error( &
+#endif
+                    "Calculating workspace_size would overflow integer type"), &
+                "nversion_algorithm:allocate_workspace:overflow" )
+#else
+            call handle_error( 81000, ifail )
+#endif
+            return
+        end if
+        workspace_size = workspace_base**workspace_power
         
         ! Enforce a fixed memory bound
         if( workspace_size > workspace_bound ) then
