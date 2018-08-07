@@ -9,6 +9,7 @@
 ###############################################################################
 # NAG Fortran Compiler Release 5.3(842) - First fully supported version
 # NAG Fortran Compiler Release 5.3(856)
+# NAG Fortran Compiler Release 6.2(Chiyoda) Build 6214
 FFLAGS_nagfor=-f2003 -colour -v -fpp
 FFLAGS_nagfor+=-O0 -C=all -g90
 
@@ -35,6 +36,7 @@ FFLAGS_nagfor+=$(FFLAGS_nagfor_alt$(ALT))
 
 ###############################################################################
 # GNU Fortran (GCC) 5.2.0 2015
+# GNU Fortran (GCC) 6.3.0 2016
 
 FFLAGS_gfortran=-std=f2003 -Wall -cpp -ffree-line-length-none -pedantic -Wimplicit-interface -Wunderflow -fbounds-check -fimplicit-none
 FFLAGS_gfortran+=-O0 -g -fbacktrace

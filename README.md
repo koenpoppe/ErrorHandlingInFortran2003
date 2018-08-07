@@ -11,7 +11,8 @@ This package requires both
 * a Fortran compiler which supports at least a subset of the Fortran 2003 standard.
 
 The software has been successfully tested with
-* NAG Fortran Compiler Release 5.3(856) and
+* NAG Fortran Compiler Release 5.3(856)
+* NAG Fortran Compiler Release 6.2(Chiyoda) Build 6214
 * GNU Fortran (GCC) 4.7.0 20111129 (experimental).
 * GNU Fortran (GCC) 5.2.0 2015
 * GNU Fortran (GCC) 6.3.0 2016
